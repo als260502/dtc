@@ -1,0 +1,10 @@
+<ifModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule ^(.*)/$ /$l [L,R=30l]
+
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+
+</ifModule>

@@ -1,0 +1,63 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title><?php $this->getPageTitle("-");?> Predialnet Predialfone</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+<link rel="stylesheet" href="/assets/css/menu.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css">
+<link href="/assets/img/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+
+</head>
+
+<?php
+//session_Start();
+
+?>
+<div class="main">
+
+    <div class="container">
+
+        <center>
+            <?php $this->renderView('alerts/_error') ?>
+            <div class="middle">
+
+                <div id="login">
+                    <div class="logo">
+                        <img src="/assets/img/logo-predialnet_B.png" alt="Predialnet - Provedor de Internet - Predialnet - Provedor de Internet">
+                    </div>
+
+                    <div class="vline"></div>
+                    <div class="vspace"></div>
+                    <form action="/login/auth" method="post">
+                        <fieldset class="clearfix">
+                            <p><span class="fa fa-user"></span>
+                                <input type="text" name="user"  Placeholder="Username"
+                                       value="<?php echo (isset($this->inputs['user'])) ? $this->inputs['user'] : '' ?>" required></p> <!-- JS because of IE support; better: placeholder="Username" -->
+
+
+                            <p><span class="fa fa-lock"></span><input type="password" name="password"  Placeholder="Password" required></p> <!-- JS because of IE support; better: placeholder="Password" -->
+
+                            <div>
+                                <span style="width:48%; text-align:left;  display: inline-block;"><a class="small-text" href="#"><!--Forgot password?--></a></span>
+                                <span style="width:50%; text-align:right;  display: inline-block;"><input type="submit" value="Entrar"></span>
+                            </div>
+                        </fieldset>
+                        <div class="clearfix"></div>
+                    </form>
+                    <div class="clearfix"></div>
+                </div>
+
+            </div>
+        </center>
+    </div>
+
+</div>
+
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/scripts.js"></script>

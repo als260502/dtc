@@ -1,0 +1,24 @@
+{
+  "name": "pnex/pnex-dtc",
+  "description": "Monitoramento e congifurações dtc",
+  "licence":"MIT",
+  "type":"project",
+  "authors":[
+    {
+      "name": "André Souza", "email":"andresouza@predialnet.com.br"
+    },
+    {
+      "name": "Thiago", "email":"thiagovelloso@predialnet.com.br"
+    }
+  ],
+  "autoload":{
+    "psr-4":{
+      "App\\":"pnet/app/",
+      "Core\\":"core/"
+    }
+  },
+  "require": {
+    "php": ">=5.6.4",
+    "illuminate/database": "^5.4"
+  }
+}
