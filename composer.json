@@ -5,10 +5,12 @@
   "type":"project",
   "authors":[
     {
-      "name": "André Souza", "email":"andresouza@predialnet.com.br"
+      "name": "André Souza",
+      "email":"andresouza@predialnet.com.br"
     },
     {
-      "name": "Thiago", "email":"thiagovelloso@predialnet.com.br"
+      "name": "Thiago",
+      "email":"thiagovelloso@predialnet.com.br"
     }
   ],
   "autoload":{

@@ -15,7 +15,7 @@ class Auth
     private static $name = null;
     private static $email = null;
     private static $user = null;
-    private static $pnetuname = null;
+
 
     public function __construct()
     {
@@ -27,7 +27,6 @@ class Auth
             self::$name = $user['name'];
             self::$email = $user['email'];
             self::$user = $user['user'];
-            self::$pnetuname = $user['pnetuname'];
 
 
         }
@@ -51,7 +50,7 @@ class Auth
 
     public static function check()
     {
-        if(self::$pnetuname == null ||  self::$user == null)
+        if(self::name == null ||  self::$user == null)
             return false;
 
         return true;

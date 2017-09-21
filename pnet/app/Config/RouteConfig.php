@@ -8,7 +8,6 @@ class RouteConfig
 {
 
     public function getRoutes(){
-        $routes[] =['/', 'HomeController@index'];
 
         $routes[] =['/login', 'UserController@login'];
         $routes[] =['/login/auth', 'UserController@auth'];
