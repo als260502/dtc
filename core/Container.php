@@ -8,8 +8,6 @@
 
 namespace Core;
 
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
-
 class Container
 {
     public static function newController(string $controller)

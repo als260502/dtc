@@ -1,4 +1,19 @@
-@import "bootstrap.min.css";
-
 /* custom style */
 .row-bottom-20{margin-top: 20px}
+
+.version_text{
+    font-size: 10px;
+    font-style: italic;
+}
+
+table th{
+    border-style: solid;
+    background-color: #777777;
+}
+table th, td{
+    font-size:11px;
+    border: 2px #ffffff solid !important;
+}
+table td {
+    background-color: whitesmoke;
+}

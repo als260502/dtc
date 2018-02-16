@@ -24,7 +24,7 @@ class Database
                 ],
             'mysql'=> [
                 'host' => 'localhost',
-                'database' => 'predialfone',
+                'database' => 'datacom',
                 'user' => 'root',
                 'pass' => '',
                 'charset' => 'utf8',

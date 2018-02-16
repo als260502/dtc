@@ -32,7 +32,7 @@ trait Authenticate
 
             Session::set('user', $user);
 
-            return Redirect::routeRedirect('/posts');
+            return Redirect::routeRedirect('/dtc');
 
     }
 

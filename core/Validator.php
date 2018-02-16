@@ -40,7 +40,7 @@ class Validator
                                         $objModel = "\\App\\Models\\" . $subItems[1];
                                         $model = new $objModel;
                                         $find = $model->where($subItems[2], $dataValue)->first();
-
+                                        //var_dump($find);
                                         if (isset($find->$subItems[2])) {
 
                                             if (isset($subItems[3]) && $find->id == $subItems[3]) {

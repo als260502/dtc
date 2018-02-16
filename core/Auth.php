@@ -50,7 +50,7 @@ class Auth
 
     public static function check()
     {
-        if(self::name == null ||  self::$user == null)
+        if(self::$name == null ||  self::$user == null)
             return false;
 
         return true;

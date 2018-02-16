@@ -18,16 +18,16 @@ class User extends BaseModelEloquent
     public $table = 'users';
     public $timestamps = false;
 
-    protected $fillable = ['name', 'email', 'password'];
+    protected $fillable = ['name', 'email', 'password', 'user'];
 
 
     public function validateInsert(){
 
         return [
             'name' => 'min:2|max:255',
-            'email'=> 'email|unique:User:email',
-            'password' => 'min:6|max:16',
-            'user' => 'require'
+            'email'=> 'email',
+            'password' => 'min:4|max:16',
+            'user' => 'min:1|require'
         ];
 
     }
@@ -43,14 +43,6 @@ class User extends BaseModelEloquent
 
     }
 
-    public function post()
-    {
-        /*
-        *relacionamento 1-n
-        * um usuario pode ter varios posts
-        */
-        return $this->hasMany(Post::class);
-    }
 
 
 }

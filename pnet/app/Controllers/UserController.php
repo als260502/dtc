@@ -12,6 +12,7 @@ namespace App\Controllers;
 use App\Models\User;
 use Core\BaseController;
 use Core\Redirect;
+use Core\Session;
 use Core\Validator;
 use Core\Authenticate;
 
@@ -27,10 +28,18 @@ class UserController extends BaseController
         $this->users = new User();
     }
 
+    public function index(){
+
+        $this->setPageTitle("Login");
+
+        return $this->renderView('/user/login');
+
+    }
+
+
     public function create(){
 
         $this->setPageTitle("New User");
-
         return $this->renderView('/user/create', 'layout');
 
     }
@@ -41,13 +50,17 @@ class UserController extends BaseController
             [
                 'name' => $request->post->name,
                 'email' => $request->post->email,
-                'password' => $request->post->password
+                'password' => $request->post->password,
+                'user' => $request->post->user
             ];
+
+
 
         if(Validator::make($data, $this->users->validateInsert()))
         {
             return Redirect::routeRedirect('/user/create');
         }
+
 
         $data['password'] = password_hash($request->post->password, PASSWORD_BCRYPT);
 
