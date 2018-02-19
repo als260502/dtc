@@ -1,0 +1,59 @@
+<h1 class="h1">Configurar ONU</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form role="form">
+            <div class="form-group">
+
+                <label for="chassi">
+                    Chassi
+                </label>
+                <select name="chassi" id="chassi" class="form-control form-group-sm" >
+                    <option>Selecione o chasi</option>
+                    <?php foreach ($this->view->chassi as $ch): ?>
+                    <option value="<?php echo $ch->id.'|'.$ch->actives_olt; ?>" data-qtd=<?php echo $ch->actives_olt; ?> > <?php echo $ch->name; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+
+                <label for="olt">
+                    OLT
+                </label>
+                <select name="olt" id="olt" class="form-control form-group-sm">
+                    <option>Seleciona a Placa</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+
+                <label for="nome">
+                    Nome do local
+                </label>
+                <input type="name" class="form-control" id="name" />
+            </div>
+            <div class="form-group">
+
+                <label for="serial">
+                   Seria number
+                </label>
+                <input type="serial" class="form-control" id="serial" />
+            </div>
+            <button type="submit" class="btn btn-default">
+                Configurar
+            </button>
+        </form>
+
+        <form role="form" method="post" action="">
+            <button type="submit" class="btn btn-default">
+                Buscar Serial
+            </button>
+        </form>
+
+    </div>
+    <div class="col-md-6">
+    </div>
+    <div class="col-md-2">
+        <span id="sn"></span>
+    </div>
+</div>

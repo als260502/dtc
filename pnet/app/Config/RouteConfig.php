@@ -17,7 +17,16 @@ class RouteConfig
         $routes[] =['/user/store', 'UserController@store'];
 
         $routes[] =['/dtc', 'GponController@index', 'auth'];
+        $routes[] =['/dtc/config', 'GponController@config', 'auth'];
+        $routes[] =['/dtc/change', 'GponController@change', 'auth'];
+        $routes[] =['/dtc/reset', 'GponController@reset', 'auth'];
+        $routes[] =['/dtc/mac', 'GponController@mac', 'auth'];
+
+        $routes[] =['/dtc/config/{id}', 'GponController@mac', 'auth'];
+
+
         $routes[] =['/dtc/mon', 'GponController@mon', 'auth'];
+
 
 
         return $routes;
