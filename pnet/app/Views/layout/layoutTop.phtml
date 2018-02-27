@@ -22,50 +22,47 @@
 </head>
 
 <body>
+<nav class="navbar navbar-expand-md navbar-light bg-light fixed-top ">
+    <a class="navbar-brand" href="/dtc">Pnex DTC</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a href="/" class="navbar-brand">Pnex-DTC <small class="version_text">v1.0</small></a>
-        </div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+             <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Menu
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="#">Action</a>
+                    <a class="dropdown-item" href="#">Another action</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                </div>
+            </li>
 
+        </ul>
 
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        Menu <span class="caret"></span>
+        <ul class="navbar-nav navbar-right">
+            <?php  if ($this->auth->check()): ?>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="/assets/open-iconic-master/svg/person.svg" alt="account-logout" /> <?php echo $this->auth->name(); ?>
                     </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="/dtc/mon">Monitoramento</a></li>
-                        <li><a href="/dtc">Configurar ONU</a></li>
 
-                    </ul>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/logout"><img src="/assets/open-iconic-master/svg/account-logout.svg" alt="account-logout" /> Logout</a>
+                    </div>
+
                 </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <?php  if ($this->auth->check()): ?>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            <i class="glyphicon glyphicon-user"></i> <?php echo $this->auth->name(); ?> <span class="caret"></span>
-                        </a>
-
-                        <ul class="dropdown-menu">
-                            <li><a href="/logout"> <i class="glyphicon glyphicon-log-out"></i> Logout</a></li>
-                        </ul>
-                    </li>
-                <?php else: ?>
-                    <li><a href="/login"><i class="glyphicon glyphicon-log-in"></i> Login</a></li>
-                   <li><a href="/user/create"><i class="glyphicon glyphicon-pencil"></i> Register</a></li>
-                <?php endif; ?>
-            </ul>
-        </div><!--/.navbar-collapse -->
+            <?php else: ?>
+                <li><a href="/login"><i class="glyphicon glyphicon-log-in"></i> Login</a></li>
+                <li><a href="/user/create"><i class="glyphicon glyphicon-pencil"></i> Register</a></li>
+            <?php endif; ?>
+        </ul>
+    </div><!--/.navbar-collapse -->
+    </div>
     </div>
 </nav>
 

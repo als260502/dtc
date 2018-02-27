@@ -1,17 +1,26 @@
-<h1 class="h1">Configurar ONU</h1>
-
 <div class="row">
-    <div class="col-md-6">
-        <form role="form">
+    <div class="col-md-12">
+        <h1 class="h1" xmlns="http://www.w3.org/1999/html">Configurar ONU</h1>
+    </div>
+</div>
+<div class="row">
+
+    <div class="col-md-3">
+        <form role="form" method="post">
             <div class="form-group">
 
                 <label for="chassi">
                     Chassi
                 </label>
-                <select name="chassi" id="chassi" class="form-control form-group-sm" >
-                    <option>Selecione o chasi</option>
+                <select name="chassi[]" id="chassi" class="form-control form-group-sm">
+                    <option value="0">Chassi / Local</option>
                     <?php foreach ($this->view->chassi as $ch): ?>
-                    <option value="<?php echo $ch->id.'|'.$ch->actives_olt; ?>" data-qtd=<?php echo $ch->actives_olt; ?> > <?php echo $ch->name; ?></option>
+                        <option value="<?php
+                        $array = [$ch->id, $ch->actives_olt];
+                        echo json_encode($array);
+                        ?>">
+                            <?php echo $ch->name; ?></option>
+
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -21,39 +30,88 @@
                     OLT
                 </label>
                 <select name="olt" id="olt" class="form-control form-group-sm">
-                    <option>Seleciona a Placa</option>
+                    <option>Selecione um chassi</option>
                 </select>
             </div>
 
             <div class="form-group">
 
-                <label for="nome">
+                <label for="name">
                     Nome do local
                 </label>
-                <input type="name" class="form-control" id="name" />
+                <input type="text" name="name" class="form-control" id="name"/>
+
             </div>
             <div class="form-group">
-
                 <label for="serial">
-                   Seria number
+                    Serial number
                 </label>
-                <input type="serial" class="form-control" id="serial" />
+                <input type="text" name="serial" class="form-control" id="serial"/>
+            </div>
+            <div class="form-group">
+                <label for="service_port">
+                    Service port novo
+                </label>
+                <input type="text" name="service_port" class="form-control" id="service_port"
+                       value="<?php echo (isset($this->view->servicePort)) ? $this->view->servicePort : ''; ?>"
+                       disabled/>
+            </div>
+            <div class="form-group">
+                <label for="vlan">
+                    Vlan nova
+                </label>
+                <input type="text" name="vlan" class="form-control" id="vlan"
+                       value="<?php echo (isset($this->view->vlan)) ? $this->view->vlan : ''; ?>" disabled/>
             </div>
             <button type="submit" class="btn btn-default">
                 Configurar
             </button>
-        </form>
-
-        <form role="form" method="post" action="">
-            <button type="submit" class="btn btn-default">
+            <button type="submit" class="btn btn-default" id="findMac">
                 Buscar Serial
             </button>
-        </form>
 
     </div>
-    <div class="col-md-6">
+    <div class="col-md-5">
+        <label for="selectionPorts">
+            Selecione a quantidade de portas
+        </label>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="selectionPorts"></label>
+            </div>
+            <select class="custom-select" id="selectionPorts" name="selectionPorts">
+                <option value="0" selected>Selecione</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+        </div>
+        <div class="row" id="qtd_portas">
+
+        </div><!-- fim do div qtd_portas -->
+
+
     </div>
-    <div class="col-md-2">
-        <span id="sn"></span>
+
+    <div class="col-md-3">
+
+    </div>
+    </form>
+
+</div>
+<p></p>
+<div class="row">
+    <div class="col-md-6">
+        <?php if (isset($this->view->mac)): ?>
+            <div class="alert alert-<?php echo $this->view->class; ?>" role="alert" id="serialNumber">
+                <?php if ($this->view->mac == "Nenhum gpon encontrado!"): ?>
+                    <?php echo $this->view->mac; ?>
+                <?php else: ?>
+                    <button type="button" id="serialButton"
+                            class="btn btn-info"><?php echo $this->view->mac; ?> </button>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </div>
 </div>

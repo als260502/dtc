@@ -17,11 +17,7 @@ class Gpon extends BaseModelEloquent
     public $table = 'gpons';
     public $timestamps = false;
 
-    protected $fillable = ['index', 'name', 'serial', 'service_port'];
-
-    public function olt(){
-        $this->belongsToMany(Olt::class);
-    }
+    protected $fillable = ['index', 'name', 'serial', 'service_port', 'olt_id'];
 
     public function port(){
         $this->hasMany(Port::class);

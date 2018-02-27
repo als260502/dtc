@@ -2,17 +2,18 @@
 require_once __DIR__ . "/vendor/autoload.php";
 
 
-$telnet = new \Core\Telnet('192.168.21.53');
+$telnet = new \Core\Telnet('10.0.20.222');
 
-//$comm = $telnet->doComand("show interface gpon 1/1/1");
+$comm = $telnet->getDiscoveredOnu(1);
 
-//var_dump($comm);
+var_dump($comm);
 
+/*
 $user = 'admin';
 $pass ='pnetsenhanova2014';
 
-$socket = fsockopen('192.168.21.53', 23);
-echo fgets($socket);
+$socket = fsockopen('10.0.20.222', 23);
+fgets($socket);
 fputs($socket, "{$user}\r\n");
 sleep(1);
 fputs($socket, "{$pass}\r\n");
@@ -57,3 +58,4 @@ fclose($socket);
 //var_dump($info);
 //echo fgets($socket);
 
+*/
