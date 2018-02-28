@@ -42,6 +42,7 @@ class GponController extends BaseController
             if ($request->post->chassi[0] != '0') {
                 preg_match_all("/[0-9]/", $request->post->chassi[0], $olt);
                 $ch = Chassi::where('id', $olt[0])->first();
+
                 $tn = new Telnet($ch->address);
                 $mac = $tn->getDiscoveredOnu($request->post->olt);
 
@@ -49,7 +50,8 @@ class GponController extends BaseController
                     $this->view->mac = $mac;
                     $this->view->class = 'info';
 
-                    $olt = Olt::where('id', $request->post->olt)->first();
+                    
+                    $olt = $ch->olt()->where('index', $request->post->olt)->first();
                     $gpon = Gpon::where('olt_id', $olt->id)->orderBy('service_port', 'desc')->first();
 
                     $this->view->servicePort = (isset($gpon->service_port))? $gpon->service_port + 1: 0;
