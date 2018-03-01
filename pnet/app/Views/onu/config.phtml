@@ -6,7 +6,7 @@
 <div class="row">
 
     <div class="col-md-3">
-        <form role="form" method="post">
+        <form role="form" method="post" name="onuForm" id="onuForm">
             <div class="form-group">
 
                 <label for="chassi">
@@ -39,20 +39,20 @@
                 <label for="name">
                     Nome do local
                 </label>
-                <input type="text" name="name" class="form-control" id="name"/>
+                <input type="text" required="required" name="name" class="form-control" id="name"/>
 
             </div>
             <div class="form-group">
                 <label for="serial">
                     Serial number
                 </label>
-                <input type="text" name="serial" class="form-control" id="serial"/>
+                <input type="text" name="serial" class="form-control" id="serial" required />
             </div>
             <div class="form-group">
                 <label for="service_port">
                     Service port novo
                 </label>
-                <input type="text" name="service_port" class="form-control" id="service_port"
+                <input type="text" required name="service_port" class="form-control" id="service_port"
                        value="<?php echo (isset($this->view->servicePort)) ? $this->view->servicePort : ''; ?>"
                        disabled/>
             </div>
@@ -60,13 +60,13 @@
                 <label for="vlan">
                     Vlan nova
                 </label>
-                <input type="text" name="vlan" class="form-control" id="vlan"
+                <input type="text" required name="vlan" class="form-control" id="vlan"
                        value="<?php echo (isset($this->view->vlan)) ? $this->view->vlan : ''; ?>" disabled/>
             </div>
-            <button type="submit" class="btn btn-default">
+            <button type="button" class="btn btn-default configOnu"  >
                 Configurar
             </button>
-            <button type="submit" class="btn btn-default" id="findMac">
+            <button type="button" class="btn btn-default findMac" >
                 Buscar Serial
             </button>
 
@@ -114,4 +114,5 @@
             </div>
         <?php endif; ?>
     </div>
+    <?php  var_dump(\Core\Session::get('error')); ?>
 </div>

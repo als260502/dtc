@@ -28,8 +28,17 @@ class Telnet
 
     private function openSocket()
     {
-        try {
-            $this->socket = fsockopen($this->host, 23);
+
+            $this->socket = fsockopen($this->host, 23, $errno, $errstr, 5);
+
+            //var_dump($this->socket);
+
+            if(!$this->socket){
+                $this->socket = false;
+                return("ERRO: {$errno}\n{$errstr}\n");
+            }
+
+            //stream_set_timeout($this->socket, 1);
             fgets($this->socket);
             sleep(1);
             fputs($this->socket, "{$this->user}\r\n");
@@ -37,9 +46,7 @@ class Telnet
             fputs($this->socket, "{$this->pass}\r\n");
             sleep(1);
 
-        } catch (\Exception $e) {
-            echo "ERRO: {$e->getMessage()}";
-        }
+            return $this->socket;
 
 
     }
@@ -54,7 +61,7 @@ class Telnet
 
     private function executeComand($comand)
     {
-        $this->openSocket();
+        if(!$this->openSocket())return;
         if ($this->socket) {
             fputs($this->socket, "{$comand}\r\n");
             stream_set_timeout($this->socket, 2);

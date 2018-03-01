@@ -22,7 +22,8 @@ class RouteConfig
         $routes[] =['/dtc/reset', 'GponController@reset', 'auth'];
         $routes[] =['/dtc/mac', 'GponController@mac', 'auth'];
 
-        $routes[] =['/dtc/config/{id}', 'GponController@mac', 'auth'];
+        $routes[] =['/dtc/find', 'GponController@findSerial', 'auth'];
+        $routes[] =['/dtc/save', 'GponController@configOnu', 'auth'];
 
 
         $routes[] =['/dtc/mon', 'GponController@mon', 'auth'];

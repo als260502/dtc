@@ -23,4 +23,8 @@ class Olt extends BaseModelEloquent
         $this->hasMany(Gpon::class);
     }
 
+    public function chassi(){
+        $this->belongsTo(Chassi::class);
+    }
+
 }

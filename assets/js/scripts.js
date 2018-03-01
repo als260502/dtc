@@ -10,7 +10,7 @@ $("#chassi").on("change", function () {
     for (i = 1; i <= olts[1]; i++) {
         html += "<option value=" + i + ">" + i + "</option>";
     }
-    if (olts === 0) html += "<option>Selecione um chassi</option>";
+    if (olts === 0) html += "<option value='0'>Selecione um chassi</option>";
 
     $("#olt").html(html);
 
@@ -76,4 +76,28 @@ $("#selectionPorts").on('change', function () {
 });
 
 
+$("#onuForm [type=button]").click(function(){
 
+    var onu_name = $("#name").val();
+    var serial_number = $("#serial").val();
+    var chassi = var olts = JSON.parse($("#chassi").val());
+    var olt = $("#olt");
+    var selectionPorts = $("#selectionPorts").val();
+
+
+    if(onu_name == '' || serial_number == '' || chassi[0] == '0' || olt == '0' || selectionPorts == '0'){
+
+        alert(Alguns campos estao em branco);
+        return;
+    }
+
+
+    var acao;
+    if( $(this).hasClass('findMac') ){
+        acao = '/dtc/find';
+    }else{
+        acao = '/dtc/save';
+    }
+    $("#onuForm").attr('action', acao);
+    $("#onuForm").submit();
+});

@@ -11,10 +11,10 @@ namespace App\Controllers;
 
 use App\Models\Chassi;
 use App\Models\Gpon;
-use App\Models\Olt;
-use App\Models\Port;
 use Core\BaseController;
 use Core\Telnet;
+use Core\Validator;
+use Core\Redirect;
 
 class GponController extends BaseController
 {
@@ -23,6 +23,7 @@ class GponController extends BaseController
     {
         parent::__construct();
         $this->chassi = new Chassi();
+
     }
 
     public function index()
@@ -36,6 +37,31 @@ class GponController extends BaseController
         $this->setPageTitle("Configurar ONU");
 
         $this->view->chassi = Chassi::all();
+        $this->renderView('/onu/config', 'layout');
+
+    }
+
+    public function findSerial($request)    {
+
+        $this->setPageTitle("Configurar ONU");
+        $this->view->chassi = Chassi::all();
+
+        //var_dump($request);
+        $mGpon = new Gpon();
+
+        $dataToValidate=[
+            'onu_name' => $request->post->name,
+            'serial_number'=> $request->post->serial,
+            'chassi' => $request->post->chassi[0],
+            'olt' => $request->post->olt,
+            'selectionPorts' => $request->post->selectionPorts
+            ];
+
+        if(Validator::make($dataToValidate, $mGpon->validateFind() )) {
+            return Redirect::routeRedirect("/dtc/config", [
+                'error' => ["Erro: alguns camopos estao em branco"]
+            ]);
+        }
 
         if (isset($request->post->chassi[0])) {
 
@@ -50,12 +76,10 @@ class GponController extends BaseController
                     $this->view->mac = $mac;
                     $this->view->class = 'info';
 
-                    
                     $olt = $ch->olt()->where('index', $request->post->olt)->first();
-                    $gpon = Gpon::where('olt_id', $olt->id)->orderBy('service_port', 'desc')->first();
-
-                    $this->view->servicePort = (isset($gpon->service_port))? $gpon->service_port + 1: 0;
-                    $this->view->vlan = (isset( $gpon->vlan))? $gpon->vlan + 1: 0;
+                    $gpon = (isset($olt->id)) ? Gpon::where('olt_id', $olt->id)->orderBy('service_port', 'desc')->first() : null;
+                    $this->view->servicePort = (isset($gpon->service_port)) ? $gpon->service_port + 1 : 0;
+                    $this->view->vlan = (isset($gpon->vlan)) ? $gpon->vlan + 1 : 0;
 
                 } else {
                     $this->view->mac = "Nenhum gpon encontrado!";
@@ -66,13 +90,13 @@ class GponController extends BaseController
         }
 
         $this->renderView('/onu/config', 'layout');
+
     }
 
-    public function findSerial($request)
+    public function configOnu()
     {
 
-        //$data
-
+        $this->renderView('/onu/config', 'layout');
     }
 
 }

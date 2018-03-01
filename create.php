@@ -12,15 +12,16 @@ var_dump($comm);
 $user = 'admin';
 $pass ='pnetsenhanova2014';
 
-$socket = fsockopen('10.0.20.222', 23);
-fgets($socket);
+$socket = fsockopen('192.168.21.54', 23);
+echo fgets($socket);
+sleep(1);
 fputs($socket, "{$user}\r\n");
 sleep(1);
 fputs($socket, "{$pass}\r\n");
 sleep(1);
 
 
-$com = "show interface gpon 1/1/1 onu";
+$com = "show interface gpon 1/1/5";
 
 fputs($socket, "{$com}\r\n");
 stream_set_timeout($socket, 2);
@@ -57,5 +58,4 @@ fclose($socket);
 
 //var_dump($info);
 //echo fgets($socket);
-
 */
