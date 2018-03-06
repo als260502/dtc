@@ -17,7 +17,7 @@ class Olt extends BaseModelEloquent
     public $table = 'olts';
     public $timestamps = false;
 
-    protected $fillable = ['index', 'qtd_onu', 'chassis_id'];
+    protected $fillable = ['index','qnq', 'qtd_onu', 'chassis_id'];
 
     public function gpon(){
         $this->hasMany(Gpon::class);

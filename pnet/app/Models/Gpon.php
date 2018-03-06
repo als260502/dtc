@@ -19,7 +19,7 @@ class Gpon extends BaseModelEloquent
 
     protected $fillable = ['onu_index', 'onu_name', 'serial_number', 'port_number', 'vlan', 'service_port', 'olt_id'];
 
-    public function validateFind(){
+    public function validate(){
         return [
             'onu_name' => 'require|min:2',
             'serial_number'=> 'require',
@@ -27,6 +27,10 @@ class Gpon extends BaseModelEloquent
             'olt' => 'require',
             'selectionPorts' => 'require'
         ];
+    }
+
+    public function olt(){
+        $this->belongsTo(Olt::class);
     }
 
 }

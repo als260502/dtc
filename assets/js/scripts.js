@@ -19,7 +19,7 @@ $("#chassi").on("change", function () {
 
 $("#serialButton").on('click', function () {
     var serialField = $("#serial");
-    var serial = $("#serialNumber").text();
+    var serial = $(this).text();
     serialField.val(serial.trim());
 
     $("#serialNumber").hide();
@@ -38,31 +38,27 @@ $("#selectionPorts").on('change', function () {
         for (var i = 0; i < valorPorta; i++) {
             html += '     <div class="col-md-12">';
             html += '                <label for="tecnologia">';
-            html += '                    Tecnologia - Porta '+p;
+            html += '                    Tecnologia - Porta ' + p;
             html += '                </label>';
             html += '            </div>';
             html += '           <div class="col-sm-6">';
             html += '                <div class="input-group">';
             html += '                    <div class="input-group-prepend">';
             html += '                        <div class="input-group-text">';
-            html += '                            <input type="checkbox" name="porta[]" value="UTP"';
-            html += '                                   aria-label="Checkbox for following text input">';
+            html += '                            <input type="checkbox" name="porta[]" value="UTP" aria-label="Checkbox for following text input">';
             html += '                        </div>';
             html += '                    </div>';
-            html += '                   <input type="text" class="form-control radioValue"aria-label="Text input with radio button"';
-            html += '                           placeholder="UTP">';
+            html += '                   <input type="text" class="form-control radioValue"aria-label="Text input with radio button" placeholder="UTP">';
             html += '                </div>';
             html += '            </div>';
             html += '           <div class="col-sm-6">';
             html += '                <div class="input-group">';
             html += '                    <div class="input-group-prepend">';
             html += '                        <div class="input-group-text">';
-            html += '                            <input type="checkbox" name="porta[]" value="HPNA"';
-            html += '                                   aria-label="Checkbox for following text input">';
+            html += '                           <input type="checkbox" name="porta[]" value="HPNA" aria-label="Checkbox for following text input">';
             html += '                        </div>';
             html += '                    </div>';
-            html += '                    <input type="text" class="form-control" aria-label="Text input with radio button"';
-            html += '                           placeholder="HPNA">';
+            html += '                    <input type="text" class="form-control" aria-label="Text input with radio button" placeholder="HPNA">';
             html += '                </div>';
             html += '            </div>';
 
@@ -76,28 +72,48 @@ $("#selectionPorts").on('change', function () {
 });
 
 
-$("#onuForm [type=button]").click(function(){
+$("#onuForm [type=button]").click(function () {
 
     var onu_name = $("#name").val();
     var serial_number = $("#serial").val();
-    var chassi = var olts = JSON.parse($("#chassi").val());
+    var chassi = JSON.parse($("#chassi").val());
     var olt = $("#olt");
     var selectionPorts = $("#selectionPorts").val();
-
-
-    if(onu_name == '' || serial_number == '' || chassi[0] == '0' || olt == '0' || selectionPorts == '0'){
-
-        alert(Alguns campos estao em branco);
-        return;
-    }
-
+    console.log(chassi);
 
     var acao;
-    if( $(this).hasClass('findMac') ){
+    if ($(this).hasClass('findMac')) {
+
+        if (chassi == '0' || olt == '0') {
+            alert('Selecione o CHASSI e PLACA por favor!');
+            return;
+        }
         acao = '/dtc/find';
-    }else{
+    }
+    else
+    {
+        if (onu_name == '' || serial_number == '' || chassi == '0' || olt == '0' || selectionPorts == '0') {
+            alert('Alguns campos estao em branco');
+            return;
+        }
         acao = '/dtc/save';
     }
     $("#onuForm").attr('action', acao);
     $("#onuForm").submit();
 });
+
+
+if($("#chassiNumber").text() != ''){
+
+    var chassiValue = $("#chassi").val($("#chassiNumber").text().trim());
+    var mValue = JSON.parse($("#chassi").val());
+    console.log(mValue+" "+chassiValue);
+    console.log($("#chassiNumber").text().trim());
+
+    $('#olt').html($('<option>', {
+        value: mValue['1'],
+        text: mValue['1']
+    }));
+}
+//console.log($("#chassiNumber").text());
+//console.log($("#oltNumber").text());

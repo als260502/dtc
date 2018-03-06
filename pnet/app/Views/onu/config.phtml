@@ -46,7 +46,7 @@
                 <label for="serial">
                     Serial number
                 </label>
-                <input type="text" name="serial" class="form-control" id="serial" required />
+                <input type="text" name="serial" class="form-control" id="serial" required/>
             </div>
             <div class="form-group">
                 <label for="service_port">
@@ -54,19 +54,20 @@
                 </label>
                 <input type="text" required name="service_port" class="form-control" id="service_port"
                        value="<?php echo (isset($this->view->servicePort)) ? $this->view->servicePort : ''; ?>"
-                       disabled/>
+                       />
             </div>
             <div class="form-group">
                 <label for="vlan">
                     Vlan nova
                 </label>
                 <input type="text" required name="vlan" class="form-control" id="vlan"
-                       value="<?php echo (isset($this->view->vlan)) ? $this->view->vlan : ''; ?>" disabled/>
+                       value="<?php echo (isset($this->view->vlan)) ? $this->view->vlan : ''; ?>" />
+                <input type="hidden" value="<?php print (isset($this->view->onuIndex))?$this->view->onuIndex:''; ?>" name="onu_index" />
             </div>
-            <button type="button" class="btn btn-default configOnu"  >
+            <button type="button" class="btn btn-default configOnu">
                 Configurar
             </button>
-            <button type="button" class="btn btn-default findMac" >
+            <button type="button" class="btn btn-default findMac">
                 Buscar Serial
             </button>
 
@@ -108,11 +109,19 @@
                 <?php if ($this->view->mac == "Nenhum gpon encontrado!"): ?>
                     <?php echo $this->view->mac; ?>
                 <?php else: ?>
-                    <button type="button" id="serialButton"
-                            class="btn btn-info"><?php echo $this->view->mac; ?> </button>
+                    <button type="button" id="serialButton" class="btn btn-info">
+                        <?php echo $this->view->mac; ?>
+                    </button>
+                    <span hidden id="chassiNumber">
+                        <?php print "{$this->view->chassiNumber[0]}"; ?>
+                    </span>
+
                 <?php endif; ?>
             </div>
         <?php endif; ?>
     </div>
-    <?php  var_dump(\Core\Session::get('error')); ?>
+    <?php //var_dump($this->view->chassiNumber);
+    //var_dump($this->view->oltNumber);
+    ?>
 </div>
+
