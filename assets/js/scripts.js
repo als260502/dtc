@@ -78,8 +78,13 @@ $("#onuForm [type=button]").click(function () {
     var serial_number = $("#serial").val();
     var chassi = JSON.parse($("#chassi").val());
     var olt = $("#olt");
-    var selectionPorts = $("#selectionPorts").val();
+    var checkeds = new Array();
+    $("input[name='porta[]']:checked").each(function () {
+
+        checkeds.push($(this).val());
+    });
     console.log(chassi);
+    console.log(checkeds);
 
     var acao;
     if ($(this).hasClass('findMac')) {
@@ -90,24 +95,24 @@ $("#onuForm [type=button]").click(function () {
         }
         acao = '/dtc/find';
     }
-    else
-    {
-        if (onu_name == '' || serial_number == '' || chassi == '0' || olt == '0' || selectionPorts == '0') {
-            alert('Alguns campos estao em branco');
+    else {
+        if (onu_name == '' || serial_number == '' || chassi == '0' || olt == '0' || checkeds.length === 0) {
+            alert('Alguns campos estao em branco ou não ha porta selecionada!!');
             return;
         }
         acao = '/dtc/save';
     }
     $("#onuForm").attr('action', acao);
+
     $("#onuForm").submit();
 });
 
 
-if($("#chassiNumber").text() != ''){
+if ($("#chassiNumber").text() != '') {
 
     var chassiValue = $("#chassi").val($("#chassiNumber").text().trim());
     var mValue = JSON.parse($("#chassi").val());
-    console.log(mValue+" "+chassiValue);
+    console.log(mValue + " " + chassiValue);
     console.log($("#chassiNumber").text().trim());
 
     $('#olt').html($('<option>', {

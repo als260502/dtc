@@ -150,65 +150,6 @@ class Telnet
 
     }
 
-    private function utpConfig(Gpon $gpon, $tecnologia)
-    {
-
-        $this->configString .= "config\r\n
-        interface gpon 1/1/{$gpon->olt->index}\r\n
-        onu {$gpon->onu_index}\r\n
-        name {$gpon->onu_name}\r\n
-        serial-number {$gpon->serial_number}\r\n
-        service-profile Bridge line-profile Bridge-UTP\r\n
-        ethernet {$gpon->port_number}\r\n
-        negotiation\r\n
-        no shutdown\r\n
-        native vlan vlan-id {$gpon->vlan}\r\n
-        mac-limit 255\r\n
-        !\r\n
-        !\r\n";
-
-        $this->configString .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem {$i} match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$gpon->qnq}\r\n";
-
-    }
-
-    private function hpnaConfig(Gpon $gpon, $tecnologia)
-    {
-
-        $this->configString .= "config\r\n
-        interface gpon 1/1/{$gpon->olt->index}\r\n
-        onu {$gpon->onu_index}\r\n
-        name {$gpon->onu_name}\r\n
-        serial-number {$gpon->serial_number}\r\n
-        service-profile Bridge line-profile Bridge-UTP\r\n
-        ethernet {$gpon->port_number}\r\n
-        negotiation\r\n
-        no shutdown\r\n
-        native vlan vlan-id {$gpon->vlan}\r\n
-        mac-limit 255\r\n
-        !\r\n
-        !\r\n";
-
-        switch ($gpon->port_number)
-        {
-            case 2:
-                $this->configString .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem {2} match vlan vlan-id 2 action vlan add vlan-id {$gpon->qnq}\r\n";
-                $this->configString .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem {3} match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$gpon->qnq}\r\n";
-                break;
-            case 3:
-                $this->configString .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem {3} match vlan vlan-id 2 action vlan add vlan-id {$gpon->qnq}\r\n";
-                $this->configString .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem {4} match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$gpon->qnq}\r\n";
-                break;
-            case 3:
-                $this->configString .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem {4} match vlan vlan-id 2 action vlan add vlan-id {$gpon->qnq}\r\n";
-                $this->configString .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem {5} match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$gpon->qnq}\r\n";
-                break;
-            default:
-                $this->configString .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem {1} match vlan vlan-id 2 action vlan add vlan-id {$gpon->qnq}\r\n";
-                $this->configString .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem {2} match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$gpon->qnq}\r\n";
-                break;
-        }
-
-    }
 
     private function config(Gpon $gpon,$tecnologia)
     {

@@ -25,7 +25,7 @@ class Gpon extends BaseModelEloquent
             'serial_number'=> 'require',
             'chassi' => 'require',
             'olt' => 'require',
-            'selectionPorts' => 'require'
+
         ];
     }
 

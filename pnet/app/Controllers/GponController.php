@@ -93,13 +93,12 @@ class GponController extends BaseController
         $olt = $ch->olt()->where('index', $request->post->olt)->first();
         $tn = new Telnet($ch->address);
 
-        var_dump($request);die;
+        //var_dump($request,$request->post->porta[0]);die;
 
         $validate = ['onu_name' => $request->post->name
             ,'serial_number' => $request->post->serial
             ,'chassi' => $chassiNumber
             ,'olt' => $request->post->olt
-            ,'selectionPorts' => $request->post->selectionPorts
 
         ];
 
@@ -109,7 +108,7 @@ class GponController extends BaseController
                 'Error' => "campos obrigatorio estão em branco"]);
         }
 
-        for ($i = 0; $i < $request->post->selectionPorts; $i++){
+        for ($i = 0; $i < count($request->post->porta); $i++){
             $data = ['onu_index' => $request->post->onu_index
                 ,'onu_name' => $request->post->name
                 ,'serial_number' => $request->post->serial
@@ -121,8 +120,12 @@ class GponController extends BaseController
 
             $gp = $gpon->create($data);
             $gponId[] = $gp->id;
-
+            $tec[] = $ports = (isset($request->post->porta))? $request->post->porta[$i]: 'UTP';
         }
+
+        $tecnologia = (count($tec) > 1) ? implode('/', $tec):'UTP';
+        $newGpon = Gpon::find($gponId[0]);
+
 
 
         $this->renderView('/onu/config', 'layout');
