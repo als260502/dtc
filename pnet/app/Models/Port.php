@@ -16,11 +16,11 @@ class Port extends BaseModelEloquent
     public $table = 'ports';
     public $timestamps = false;
 
-    protected $fillable = ['port_number', 'vlan', 'gpons_id'];
+    protected $fillable = ['name'];
 
 
-    public function gpon(){
-        $this->belongsTo(Gpon::class);
+    public function gpons(){
+        return $this->belongsToMany(Gpon::class);
     }
 
 }

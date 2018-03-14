@@ -24,7 +24,7 @@ class Olt extends BaseModelEloquent
     }
 
     public function chassi(){
-        $this->belongsTo(Chassi::class);
+        $this->belongsTo(Chassi::class, 'olt_id');
     }
 
 }

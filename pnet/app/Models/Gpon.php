@@ -28,9 +28,20 @@ class Gpon extends BaseModelEloquent
 
         ];
     }
+    public function validateChange()
+    {
+        return['serrial_number' => 'require|min:12'];
+    }
 
     public function olt(){
-        $this->belongsTo(Olt::class);
+        return $this->belongsTo(Olt::class);
     }
+
+    public function ports()
+    {
+        return $this->belongsToMany(Port::class);
+    }
+
+
 
 }

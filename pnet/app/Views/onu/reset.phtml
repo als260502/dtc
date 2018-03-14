@@ -1,0 +1,61 @@
+<p></p>
+<div class="row">
+    <div class="col-md-6">
+        <h3>
+            <?php echo $this->getPageTitle(); ?>
+        </h3>
+        <hr class="hr-primary"/>
+        <form role="form" method="post" name="resetOnu" id="formOnu" action="/dtc/reboot">
+            <div class="form-group">
+
+                <div class="input-group mb-3">
+                    <select class="custom-select" id="onuName" name="onuName">
+                        <option value="selecione">Escolha...</option>
+                        <?php foreach ($this->view->onu as $onu): ?>
+
+                            <option value="<?php echo $onu->id; ?>"><?php echo $onu->onu_name; ?></option>
+
+                        <?php endforeach; ?>
+
+                    </select>
+                    <div class="input-group-append">
+                        <label class="input-group-text" for="onuName">Selecione a Onu</label>
+                    </div>
+                </div>
+            </div>
+
+
+            <button type="button" id="onuButton" class="btn btn-primary">
+                Rebotar ONU
+            </button>
+        </form>
+        <p></p>
+        <div id="changeAlert">
+
+        </div>
+        <div>
+            <?php if (isset($this->view->error)): ?>
+                <div class="alert alert-dismissable alert-warning">
+
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                        ×
+                    </button>
+                    <h4>
+                        Ops!
+                    </h4> <strong>Erro!</strong> <?php echo $this->view->error; ?>
+                </div>
+            <?php endif; ?>
+            <?php if (isset($this->view->complete)): ?>
+                <div class="alert alert-dismissable alert-success">
+
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                        ×
+                    </button>
+                    <h4>
+                        Tudo certo!!!
+                    </h4> <strong>Reboot concluido</strong>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div

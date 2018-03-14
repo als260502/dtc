@@ -15,44 +15,55 @@
         }
     </style>
     <link rel="stylesheet" href="/assets/css/style.css">
-<!--    <link rel="stylesheet" href="/assets/css/menu.css">-->
+    <!--    <link rel="stylesheet" href="/assets/css/menu.css">-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css">
-    <link href="/assets/img/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+    <link href="/assets/img/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
 
 </head>
 
 <body>
 <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top ">
     <a class="navbar-brand" href="/dtc">Pnex DTC</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
                     Menu
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
+
+                    <a class="dropdown-item" href="/dtc/config">Configurar ONU</a>
+                    <a class="dropdown-item" href="/dtc/change">Trocar ONU</a>
+                     <a class="dropdown-item" href="/dtc/reset">Resetar ONU</a>
+                     <a class="dropdown-item" href="/dtc/mac">Verificar mac na ONU</a>
+                     <a class="dropdown-item" href="/dtc/activate">Ativat/Desativar porta</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Something else here</a>
+                    <a class="dropdown-item" href="dtc/manage#">Gerenciar bd ONU</a>
                 </div>
             </li>
 
         </ul>
 
         <ul class="navbar-nav navbar-right">
-            <?php  if ($this->auth->check()): ?>
+            <?php if ($this->auth->check()): ?>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="/assets/open-iconic-master/svg/person.svg" alt="account-logout" /> <?php echo $this->auth->name(); ?>
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        <img src="/assets/open-iconic-master/svg/person.svg"
+                             alt="account-logout"/> <?php echo $this->auth->name(); ?>
                     </a>
 
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="/logout"><img src="/assets/open-iconic-master/svg/account-logout.svg" alt="account-logout" /> Logout</a>
+                        <a class="dropdown-item" href="/logout"><img
+                                    src="/assets/open-iconic-master/svg/account-logout.svg"
+                                    alt="account-logout"/> Logout</a>
                     </div>
 
                 </li>

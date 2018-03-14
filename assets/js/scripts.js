@@ -3,7 +3,7 @@
 $("#chassi").on("change", function () {
 
     //console.log(JSON.parse($(this).val()));
-    var olts = JSON.parse($(this).val())
+    var olts = JSON.parse($(this).val());
     var html = "";
     //html += "<option>Selecione a placa</option>";
 
@@ -25,51 +25,6 @@ $("#serialButton").on('click', function () {
     $("#serialNumber").hide();
 
 });
-var portas = 1;
-$("#selectionPorts").on('change', function () {
-
-    var valorPorta = $(this).val();
-
-    //alert(valorPorta+" "+portas);
-
-    if (valorPorta != 0) {
-        var html = "";
-        var p = 1;
-        for (var i = 0; i < valorPorta; i++) {
-            html += '     <div class="col-md-12">';
-            html += '                <label for="tecnologia">';
-            html += '                    Tecnologia - Porta ' + p;
-            html += '                </label>';
-            html += '            </div>';
-            html += '           <div class="col-sm-6">';
-            html += '                <div class="input-group">';
-            html += '                    <div class="input-group-prepend">';
-            html += '                        <div class="input-group-text">';
-            html += '                            <input type="checkbox" name="porta[]" value="UTP" aria-label="Checkbox for following text input">';
-            html += '                        </div>';
-            html += '                    </div>';
-            html += '                   <input type="text" class="form-control radioValue"aria-label="Text input with radio button" placeholder="UTP">';
-            html += '                </div>';
-            html += '            </div>';
-            html += '           <div class="col-sm-6">';
-            html += '                <div class="input-group">';
-            html += '                    <div class="input-group-prepend">';
-            html += '                        <div class="input-group-text">';
-            html += '                           <input type="checkbox" name="porta[]" value="HPNA" aria-label="Checkbox for following text input">';
-            html += '                        </div>';
-            html += '                    </div>';
-            html += '                    <input type="text" class="form-control" aria-label="Text input with radio button" placeholder="HPNA">';
-            html += '                </div>';
-            html += '            </div>';
-
-            p++;
-        }
-        $("#qtd_portas").html(html);
-
-    }
-
-
-});
 
 
 $("#onuForm [type=button]").click(function () {
@@ -79,10 +34,15 @@ $("#onuForm [type=button]").click(function () {
     var chassi = JSON.parse($("#chassi").val());
     var olt = $("#olt");
     var checkeds = new Array();
+    var pId = new Array();
     $("input[name='porta[]']:checked").each(function () {
-
         checkeds.push($(this).val());
     });
+
+    $("input[name='porta_id[]']:checked").each(function () {
+        pId.push($(this).val());
+    });
+
     console.log(chassi);
     console.log(checkeds);
 
@@ -96,7 +56,7 @@ $("#onuForm [type=button]").click(function () {
         acao = '/dtc/find';
     }
     else {
-        if (onu_name == '' || serial_number == '' || chassi == '0' || olt == '0' || checkeds.length === 0) {
+        if (onu_name == '' || serial_number == '' || chassi == '0' || olt == '0' || checkeds.length === 0 || pId.length === 0) {
             alert('Alguns campos estao em branco ou não ha porta selecionada!!');
             return;
         }
@@ -120,5 +80,81 @@ if ($("#chassiNumber").text() != '') {
         text: mValue['1']
     }));
 }
-//console.log($("#chassiNumber").text());
-//console.log($("#oltNumber").text());
+
+$("#onuButton").click(function () {
+
+    var onuName = $("#onuName");
+    var html = '';
+
+    html += '<div class="alert alert-dismissable alert-warning" >';
+    html += '           <button type="button" class="close" data-dismiss="alert" aria-hidden="true">';
+    html += '                 ×';
+    html += '             </button>';
+    html += '             <h4>';
+    html += '                 Ops!';
+    html += '             </h4>';
+    html += '            <strong>Atenção!</strong> você precisa selecionar uma ONU';
+    html += '         </div>';
+
+    if (onuName.val() === 'selecione') {
+        $("#changeAlert").html(html);
+        onuName.focus();
+        onuName.css('color', 'red');
+        return;
+    }
+    $("#formOnu").submit();
+
+});
+
+$("#changeButton").click(function () {
+
+    var serial = $("#serial-number").val();
+    var html = '';
+    var s = $("#serial-number");
+    html += '<div class="alert alert-dismissable alert-warning" >';
+    html += '           <button type="button" class="close" data-dismiss="alert" aria-hidden="true">';
+    html += '                 ×';
+    html += '             </button>';
+    html += '             <h4>';
+    html += '                 Ops!';
+    html += '             </h4>';
+    html += '            <strong>Atenção!</strong> Confirme o numero de serie digitado';
+    html += '         </div>';
+
+    //var c = confirm("Confirmar troca do serial de "+onuName+ " para "+serial);
+
+    if (serial.length < 12) {
+        $("#changeAlert").html(html);
+        s.focus();
+        s.css('color', 'red');
+        return;
+    }
+    $('#changeOnu').submit();
+    //return c; //you can just return c because it will be true or false
+});
+
+$("#activeOnu [type=button]").click(function () {
+
+    var onuName = $("#onuName");
+    var html = '';
+    var acao;
+
+
+
+
+
+    if ($(this).hasClass('selectButton')) {
+
+        acao = '/dtc/find';
+    }
+    else {
+        if (onu_name == '' || serial_number == '' || chassi == '0' || olt == '0' || checkeds.length === 0 || pId.length === 0) {
+            alert('Alguns campos estao em branco ou não ha porta selecionada!!');
+            return;
+        }
+        acao = '/dtc/save';
+    }
+    $("#onuForm").attr('action', acao);
+
+    $("#onuForm").submit();
+});

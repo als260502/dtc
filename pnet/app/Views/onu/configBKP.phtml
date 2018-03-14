@@ -76,12 +76,11 @@
             </button>
     </div>
     <div class="col-md-4">
-        <?php foreach ($this->view->ports as $porta): ?>
         <div class="form-group">
             <div class="row">
                 <div class="col-md-12">
                     <label for="tecnologia">
-                        Tecnologia - <input type="checkbox" name="porta_id[]" value="<?php echo $porta->id; ?>" > <?php echo $porta->name; ?>
+                        Tecnologia - Porta 1
                     </label>
                 </div>
                 <div class="col-md-6">
@@ -110,7 +109,105 @@
                 </div>
             </div>
         </div><!--fim do form group-->
-        <?php endforeach;  ?>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-12">
+                    <label for="tecnologia">
+                        Tecnologia - Porta 2
+                    </label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="porta[]" value="UTP"
+                                       aria-label="Checkbox for following text input">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control radioValue" aria-label="Text input with radio button"
+                               placeholder="UTP">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="porta[]" value="HPNA"
+                                       aria-label="Checkbox for following text input">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Text input with radio button"
+                               placeholder="HPNA">
+                    </div>
+                </div>
+            </div>
+        </div><!--fim do form group-->
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-12">
+                    <label for="tecnologia">
+                        Tecnologia - Porta 3
+                    </label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="porta[]" value="UTP"
+                                       aria-label="Checkbox for following text input">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control radioValue" aria-label="Text input with radio button"
+                               placeholder="UTP">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="porta[]" value="HPNA"
+                                       aria-label="Checkbox for following text input">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Text input with radio button"
+                               placeholder="HPNA">
+                    </div>
+                </div>
+            </div>
+        </div><!--fim do form group-->
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-12">
+                    <label for="tecnologia">
+                        Tecnologia - Porta 4
+                    </label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="porta[]" value="UTP"
+                                       aria-label="Checkbox for following text input">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control radioValue" aria-label="Text input with radio button"
+                               placeholder="UTP">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="porta[]" value="HPNA"
+                                       aria-label="Checkbox for following text input">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Text input with radio button"
+                               placeholder="HPNA">
+                    </div>
+                </div>
+            </div>
+        </div><!--fim do form group-->
     </div>
     </form>
     <div class="col-md-4">
@@ -122,7 +219,7 @@
         <?php endif; ?>
         <?php if (isset($this->view->complete)): ?>
             <p class="text-primary text-left">
-                <strong>Configurado com sucesso!!!</strong>
+               <strong>Configurado com sucesso!!!</strong>
             </p>
             <h5 class="h5 text-center text-success">Dados do Kompressor </h5>
             <p class="text-primary text-left">

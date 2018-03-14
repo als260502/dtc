@@ -10,6 +10,7 @@ namespace Core;
 
 
 use App\Models\Gpon;
+use App\Models\Olt;
 
 class Telnet
 {
@@ -22,7 +23,12 @@ class Telnet
     private $configString;
     private $servicePort;
     private $lineProfile;
-    private $kompresor;
+    private $olt;
+    private $kompressor;
+    private $content;
+    private $erro = null;
+    private $complete = null;
+    private $mac;
 
     public function __construct($hostIP)
     {
@@ -30,6 +36,128 @@ class Telnet
         $this->user = 'admin';
         $this->pass = 'pnetsenhanova2014';
     }
+
+    public function getKompressorData(){
+        return $this->kompressor;
+    }
+    public function getContentData(){
+        return $this->content;
+    }
+    public function getError(){
+        return $this->erro;
+    }
+    public function getResult(){
+        return $this->complete;
+    }
+    public function getMacData(){
+        return $this->mac;
+    }
+    public function getDiscoveredOnu($olt)
+    {
+
+        $command = "show interface gpon 1/1/{$olt} discovered-onus";
+        $pattern = "/DACM[A-Z0-9]+/";
+        $timeoutCount = 0;
+        $this->executeComand($command);
+        while (!feof($this->socket)) {
+            $result = fgets($this->socket, 128);
+            //print $result;
+            if (preg_match($pattern, $result)) {
+                $rt = trim($result);
+                preg_match($pattern, $rt, $this->result);
+            }
+
+            $end = preg_match("/END/", $result);
+            $info = stream_get_meta_data($this->socket);
+
+            if ($info['timed_out']) { // If timeout of connection info has got a value, the router not returning a output.
+                $timeoutCount++; // We want to count, how many times repeating.
+            }
+
+            if ($end == 1 || $timeoutCount > 1) { // If repeating more than 2 times,
+                print "\r\n";
+                break;   // the connection terminating..
+            }
+
+        }
+
+        return $this->result[0];
+
+    }
+
+    public function configOnu(Gpon $gpon, $tecnologia)
+    {
+        $this->config($gpon, $tecnologia);
+    }
+
+    public function changeOnu(Gpon $gpon)
+    {
+
+        $this->olt = Olt::find($gpon->olt_id);
+
+        $this->configString .= "config\n";
+        $this->configString .= "interface gpon 1/1/{$this->olt->index}\n";
+        $this->configString .= "onu {$gpon->onu_index}\n";
+        $this->configString .= "serial-number {$gpon->serial_number}\n";
+        $this->configString .= "!\n";
+        $this->configString .= "!\n";
+        $this->configString .= "!\n";
+
+        $this->comand = $this->configString;
+        $this->comand .= "commit\n";
+
+        $this->execute($this->comand);
+
+        if ($this->erro) return false;
+
+        return true;
+
+    }
+
+    public function resetOnu(Gpon $gpon)
+    {
+
+        $this->olt = Olt::find($gpon->olt_id);
+
+        $this->configString .= "config\n";
+        $this->configString .= "interface gpon 1/1/{$this->olt->index}\n";
+        $this->configString .= "onu-reset onu {$gpon->onu_index}\n";
+        $this->configString .= "!\n";
+        $this->configString .= "!\n";
+        $this->configString .= "!\n";
+        $this->configString .= "yes\n";
+        $this->configString .= "!\n";
+        $this->configString .= "!\n";
+        $this->configString .= "!\n";
+
+        $this->comand = $this->configString;
+
+        $this->execute($this->comand, 1);
+
+        if ($this->erro) return false;
+
+        return true;
+
+    }
+    public function getMac($gpon)
+    {
+
+       $this->olt = Olt::find($gpon->olt_id);
+
+        $this->configString = "show mac-address-table vlan {$this->olt->qnq} | include \"service-port-$gpon->service_port \" \n";
+
+        $this->comand = $this->configString;
+
+        $this->execute($this->comand, 2);
+
+        if ($this->erro) return false;
+
+
+        $gpon = null;
+        return true;
+
+    }
+
 
     private function openSocket()
     {
@@ -64,12 +192,12 @@ class Telnet
         }
     }
 
-    private function executeComand($comand)
+    private function executeComand($comand, $timeout = 2)
     {
         if (!$this->openSocket()) return;
         if ($this->socket) {
             fputs($this->socket, "{$comand}\r\n");
-            stream_set_timeout($this->socket, 2);
+            stream_set_timeout($this->socket, "{$timeout}");
         }
     }
 
@@ -96,7 +224,7 @@ class Telnet
                 $timeoutCount++; // We want to count, how many times repeating.
             }
             //if ($timeoutCount >5){ // If repeating more than 2 times,
-            if ($end == 1 || $timeoutCount > 2) { // If repeating more than 2 times,
+            if ($end == 1 || $timeoutCount > 5) { // If repeating more than 2 times,
                 print "\r\n";
                 break;   // the connection terminating..
             }
@@ -105,76 +233,48 @@ class Telnet
 
     }
 
-    public function getDiscoveredOnu($olt)
+
+    private function config(Gpon $gpon, $tecnologia)
     {
 
-        $command = "show interface gpon 1/1/{$olt} discovered-onus";
-        $pattern = "/DACM[A-Z0-9]+/";
-        $timeoutCount = 0;
-        $this->executeComand($command);
-        while (!feof($this->socket)) {
-            $result = fgets($this->socket, 128);
-            //print $result;
-            if (preg_match($pattern, $result)) {
-                $rt = trim($result);
-                preg_match($pattern, $rt, $this->result);
-            }
+        $this->olt = Olt::find($gpon->olt_id);
 
-            $end = preg_match("/END/", $result);
-            $info = stream_get_meta_data($this->socket);
-
-            if ($info['timed_out']) { // If timeout of connection info has got a value, the router not returning a output.
-                $timeoutCount++; // We want to count, how many times repeating.
-            }
-
-            if ($end == 1 || $timeoutCount > 1) { // If repeating more than 2 times,
-                print "\r\n";
-                break;   // the connection terminating..
-            }
-
-        }
-
-        return $this->result[0];
-
-    }
-
-    public function configOnu($chassi, $stringData, $placa)
-    {
-
-    }
-
-
-    private function onuStringConfig(Gpon $gpon, $tecnologia)
-    {
-
-
-    }
-
-
-    private function config(Gpon $gpon,$tecnologia)
-    {
 
         if ($tecnologia == "UTP") {
-            $this->configString .= "onu {$gpon->onu_index}\n";  
-            $this->configString .= "name {$gpon->onu_name}\n";  
+
+            $this->configString .= "config\n";
+            $this->configString .= "interface gpon 1/1/{$this->olt->index}\n";
+            $this->configString .= "onu {$gpon->onu_index}\n";
+            $this->configString .= "name {$gpon->onu_name}\n";
             $this->configString .= "serial-number {$gpon->serial_number}\n";
             $this->configString .= "service-profile Bridge line-profile Bridge-UTP\n";
             $this->configString .= "ethernet 1\n";
             $this->configString .= "negotiation\n";
             $this->configString .= "no shutdown\n";
-            $this->configString .= "native vlan vlan-id {$gpon->vlan}\n";   
+            $this->configString .= "native vlan vlan-id {$gpon->vlan}\n";
             $this->configString .= "mac-limit 255\n";
             $this->configString .= "!\n";
             $this->configString .= "!\n";
             $this->configString .= "!\n";
 
-            $this->servicePort .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$gpon->olt->qnq}\n";
+            $this->servicePort .= "service-port {$gpon->service_port} gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$this->olt->qnq}\n";
 
             $this->kompressor .= "# {$gpon->onu_name} {$gpon->serial_number}\n";
-            $this->kompressor .= "/etc/predialnet/sobe_interface {$gpon->olt->qnq} {$gpon->vlan} '[gw de telefonia]'\n";
+            $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} {$gpon->vlan} '[gw de telefonia]'\n";
             $this->kompressor .= "\n";
 
+            $this->comand = $this->configString;
+            $this->comand .= $this->servicePort;
+            $this->comand .= "commit\n";
+
+            $this->execute($this->comand);
+
+            if ($this->erro) return false;
+
         } else if ($tecnologia == "HPNA") {
+
+
+            $this->configString .= "interface gpon 1/1/{$this->olt->index}\n";
             $this->configString .= "onu {$gpon->onu_index}\n";
             $this->configString .= "name {$gpon->onu_name}\n";
             $this->configString .= "serial-number {$gpon->serial_number}\n";
@@ -187,10 +287,10 @@ class Telnet
             $this->configString .= "!\n";
             $this->configString .= "!\n";
 
-            $this->service_port .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id 2 action vlan add vlan-id {$gpon->olt->qnq}\n";
+            $this->servicePort .= "service-port {$gpon->service_port} gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id 2 action vlan add vlan-id {$this->olt->qnq}\n";
+            $this->servicePort .= "service-port " . ($gpon->service_port + 1) . "gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 2 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$this->olt->qnq}\n";
 
-            $this->service_port .= "service-port ".($gpon->service_port + 1)."gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem 2 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$gpon->olt->qnq}\n";
-
+            $this->lineProfile .= "config\n";
             $this->lineProfile .= "profile gpon line-profile HPNA_{$gpon->onu_name}\n";
             $this->lineProfile .= "no upstream-fec\n";
             $this->lineProfile .= "tcont 1 bandwidth-profile HPNA_MGMT\n";
@@ -210,14 +310,22 @@ class Telnet
             $this->lineProfile .= "!\n";
 
             $this->kompressor .= "# {$gpon->onu_name} {$gpon->serial_number}\n";
-            $this->kompressor .= "/etc/predialnet/sobe_interface {$gpon->olt->qnq} {$gpon->vlan} '[ip de telefonia]'\n";
-            $this->kompressor .= "/etc/predialnet/sobe_hpna {$gpon->olt->qnq} '[gw do master]'\n";
+            $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} {$gpon->vlan} '[ip de telefonia]'\n";
+            $this->kompressor .= "/etc/predialnet/sobe_hpna {$this->olt->qnq} '[gw do master]'\n";
             $this->kompressor .= "\n";
 
+            $this->comand  = $this->lineProfile;
+            $this->comand .= $this->configString;
+            $this->comand .= $this->servicePort;
+            $this->comand .= "commit\n";
+
+            $this->execute($this->comand);
+
+            if ($this->erro) return false;
 
         } else if ($tecnologia == "HPNA/UTP") {
 
-
+            $this->configString .= "interface gpon 1/1/{$this->olt->index}\n";
             $this->configString .= "onu {$gpon->onu_index}\n";
             $this->configString .= "name {$gpon->onu_name}\n";
             $this->configString .= "serial-number {$gpon->serial_number}\n";
@@ -230,17 +338,18 @@ class Telnet
             $this->configString .= "ethernet 2\n";
             $this->configString .= "negotiation\n";
             $this->configString .= "no shutdown\n";
-            $this->configString .= "native vlan vlan-id ".($gpon->vlan+1)."\n";
+            $this->configString .= "native vlan vlan-id " . ($gpon->vlan + 1) . "\n";
             $this->configString .= "mac-limit 255\n";
             $this->configString .= "!\n";
             $this->configString .= "!\n";
             $this->configString .= "!\n";
 
 
-            $this->service_port .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id 2 action vlan add vlan-id {$gpon->olt->qnq}\n";
-            $this->service_port .= "service-port ".($gpon->service_port+1)." gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem 2 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$gpon->olt->qnq}\n";
-            $this->service_port .= "service-port ".($gpon->service_port+2)." gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem 3 match vlan vlan-id ".($gpon->vlan+1)." action vlan add vlan-id {$gpon->olt->qnq}\n";
+            $this->servicePort .= "service-port {$gpon->service_port} gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id 2 action vlan add vlan-id {$this->olt->qnq}\n";
+            $this->servicePort .= "service-port " . ($gpon->service_port + 1) . " gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 2 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$this->olt->qnq}\n";
+            $this->servicePort .= "service-port " . ($gpon->service_port + 2) . " gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 3 match vlan vlan-id " . ($gpon->vlan + 1) . " action vlan add vlan-id {$this->olt->qnq}\n";
 
+            $this->lineProfile .= "config\n";
             $this->lineProfile .= "profile gpon line-profile HPNA_{$gpon->onu_name}\n";
             $this->lineProfile .= "no upstream-fec\n";
             $this->lineProfile .= "tcont 1 bandwidth-profile HPNA_MGMT\n";
@@ -261,22 +370,33 @@ class Telnet
             $this->lineProfile .= "gem 3\n";
             $this->lineProfile .= "tcont 3 priority 0\n";
             $this->lineProfile .= "map PPPoE-UTP\n";
-            $this->lineProfile .= "ethernet 2 vlan ".($gpon->vlan+1)." cos any\n";
+            $this->lineProfile .= "ethernet 2 vlan " . ($gpon->vlan + 1) . " cos any\n";
             $this->lineProfile .= "!\n";
             $this->lineProfile .= "!\n";
             $this->lineProfile .= "!\n";
 
             $this->kompressor .= "# {$gpon->onu_name} {$gpon->serial_number}\n";
             $this->kompressor .= "# Porta 1 Rede HPNA\n";
-            $this->kompressor .= "/etc/predialnet/sobe_interface {$gpon->olt->qnq} {$gpon->vlan} '[ip de telefonia]'\n";
-            $this->kompressor .= "/etc/predialnet/sobe_hpna {$gpon->olt->qnq} '[gw do master]'\n";
+            $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} {$gpon->vlan} '[ip de telefonia]'\n";
+            $this->kompressor .= "/etc/predialnet/sobe_hpna {$this->olt->qnq} '[gw do master]'\n";
             $this->kompressor .= "# Porta 2 Rede UTP ou SUB\n";
-            $this->kompressor .= "/etc/predialnet/sobe_interface {$gpon->olt->qnq} ".($gpon->vlan+1)." '[ip de telefonia]'\n";
+            $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} " . ($gpon->vlan + 1) . " '[ip de telefonia]'\n";
             $this->kompressor .= "\n";
+
+            $this->comand  = $this->lineProfile;
+            $this->comand .= $this->configString;
+            $this->comand .= $this->servicePort;
+            $this->comand .= "commit\n";
+
+            $this->execute($this->comand);
+
+            if ($this->erro) return false;
 
 
         } else if ($tecnologia == "UTP/UTP") {
 
+            $this->configString .= "config\n";
+            $this->configString .= "interface gpon 1/1/{$this->olt->index}\n";
             $this->configString .= "onu {$gpon->onu_index}\n";
             $this->configString .= "name {$gpon->onu_name}\n";
             $this->configString .= "serial-number {$gpon->serial_number}\n";
@@ -291,25 +411,34 @@ class Telnet
             $this->configString .= "ethernet 2\n";
             $this->configString .= "negotiation\n";
             $this->configString .= "no shutdown\n";
-            $this->configString .= "native vlan vlan-id ".($gpon->vlan+1)."\n";
+            $this->configString .= "native vlan vlan-id " . ($gpon->vlan + 1) . "\n";
             $this->configString .= "mac-limit 255\n";
             $this->configString .= "!\n";
             $this->configString .= "!\n";
             $this->configString .= "!\n";
 
-            $this->service_port .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$gpon->olt->qnq}\n";
-            $this->service_port .= "service-port ".($gpon->service_port+1)." gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem 2 match vlan vlan-id ".($gpon->vlan+1)." action vlan add vlan-id {$gpon->olt->qnq}\n";
+            $this->servicePort .= "service-port {$gpon->service_port} gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$this->olt->qnq}\n";
+            $this->servicePort .= "service-port " . ($gpon->service_port + 1) . " gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 2 match vlan vlan-id " . ($gpon->vlan + 1) . " action vlan add vlan-id {$this->olt->qnq}\n";
 
             $this->kompressor .= "# {$gpon->onu_name} {$gpon->serial_number}\n";
             $this->kompressor .= "# Porta 1 Rede do Predio\n";
-            $this->kompressor .= "/etc/predialnet/sobe_interface {$gpon->olt->qnq} {$gpon->vlan} '[gw de telefonia]'\n";
+            $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} {$gpon->vlan} '[gw de telefonia]'\n";
             $this->kompressor .= "# Porta 2 SUB\n";
-            $this->kompressor .= "/etc/predialnet/sobe_interface {$gpon->olt->qnq} ".($gpon->vlan+1)." '[gw de telefonia]'\n";
+            $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} " . ($gpon->vlan + 1) . " '[gw de telefonia]'\n";
             $this->kompressor .= "\n";
 
+            $this->comand .= $this->configString;
+            $this->comand .= $this->servicePort;
+            $this->comand .= "commit\n";
+
+            $this->execute($this->comand);
+
+            if ($this->erro) return false;
 
         } else if ($tecnologia == "UTP/UTP/UTP") {
 
+            $this->configString .= "config\n";
+            $this->configString .= "interface gpon 1/1/{$this->olt->index}\n";
             $this->configString .= "onu {$gpon->onu_index}\n";
             $this->configString .= "name {$gpon->onu_name}\n";
             $this->configString .= "serial-number {$gpon->serial_number}\n";
@@ -324,34 +453,125 @@ class Telnet
             $this->configString .= "ethernet 2\n";
             $this->configString .= "negotiation\n";
             $this->configString .= "no shutdown\n";
-            $this->configString .= "native vlan vlan-id ".($gpon->vlan+1)."\n";
+            $this->configString .= "native vlan vlan-id " . ($gpon->vlan + 1) . "\n";
             $this->configString .= "mac-limit 255\n";
             $this->configString .= "!\n";
             $this->configString .= "!\n";
             $this->configString .= "ethernet 3\n";
             $this->configString .= "negotiation\n";
             $this->configString .= "no shutdown\n";
-            $this->configString .= "native vlan vlan-id ".($gpon->vlan+2)."\n";
+            $this->configString .= "native vlan vlan-id " . ($gpon->vlan + 2) . "\n";
             $this->configString .= "mac-limit 255\n";
             $this->configString .= "!\n";
             $this->configString .= "!\n";
             $this->configString .= "!\n";
 
-            $this->service_port .= "service-port {$gpon->service_port} gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$gpon->olt->qnq}\n";
-            $this->service_port .= "service-port ".($gpon->service_port+1)." gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem 2 match vlan vlan-id ".($gpon->vlan+1)." action vlan add vlan-id {$gpon->olt->qnq}\n";
-            $this->service_port .= "service-port ".($gpon->service_port+2)." gpon 1/1/{$gpon->olt->index} onu {$gpon->onu_index} gem 3 match vlan vlan-id ".($gpon->vlan+2)." action vlan add vlan-id {$gpon->olt->qnq}\n";
+            $this->servicePort .= "service-port {$gpon->service_port} gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$this->olt->qnq}\n";
+            $this->servicePort .= "service-port " . ($gpon->service_port + 1) . " gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 2 match vlan vlan-id " . ($gpon->vlan + 1) . " action vlan add vlan-id {$this->olt->qnq}\n";
+            $this->servicePort .= "service-port " . ($gpon->service_port + 2) . " gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 3 match vlan vlan-id " . ($gpon->vlan + 2) . " action vlan add vlan-id {$this->olt->qnq}\n";
 
             $this->kompressor .= "# {$gpon->onu_name} {$gpon->serial_number}\n";
             $this->kompressor .= "# Porta 1 Rede do Predio\n";
-            $this->kompressor .= "/etc/predialnet/sobe_interface {$gpon->olt->qnq} {$gpon->vlan} '[gw de telefonia]'\n";
+            $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} {$gpon->vlan} '[gw de telefonia]'\n";
             $this->kompressor .= "# Porta 2 Rede UTP ou SUB\n";
-            $this->kompressor .= "/etc/predialnet/sobe_interface {$gpon->olt->qnq} ".($gpon->vlan+1)." '[gw de telefonia]'\n";
+            $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} " . ($gpon->vlan + 1) . " '[gw de telefonia]'\n";
             $this->kompressor .= "# Porta 3 Rede UTP ou SUB\n";
-            $this->kompressor .= "/etc/predialnet/sobe_interface {$gpon->olt->qnq} ".($gpon->vlan+2)." '[gw de telefonia]'\n";
+            $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} " . ($gpon->vlan + 2) . " '[gw de telefonia]'\n";
             $this->kompressor .= "\n";
+
+            $this->comand .= $this->configString;
+            $this->comand .= $this->servicePort;
+            $this->comand .= "commit\n";
+
+            $this->execute($this->comand);
+
+            if ($this->erro) return false;
 
         }
 
+        $gpon = null;
+        return true;
+
     }
+
+    private function execute($command, $timeout = 2)
+    {
+
+        $this->executeComand($command, $timeout);
+        $timeoutCount = 0;
+        while (!feof($this->socket)) {
+            $content = fgets($this->socket);
+            //print "$content";
+            $this->content .= $content;
+            $end = preg_match("/END/", $content);
+            $info = stream_get_meta_data($this->socket);
+
+
+
+            if (preg_match("/--More--/", $content)) { // IF current line contain --More-- expression,
+
+                fputs($this->socket, ' '); // sending space char for next part of output.
+
+            } # The "more" controlling part complated.
+
+
+            if ($info['timed_out']) { // If timeout of connection info has got a value, the router not returning a output.
+                $timeoutCount++; // We want to count, how many times repeating.
+            }
+            //if ($timeoutCount >5){ // If repeating more than 2 times,
+            if ($end == 1 || $timeoutCount > 5) { // If repeating more than 2 times,
+                print "\r\n";
+                break;   // the connection terminating..
+            }
+
+            if (preg_match("/Aborted:/", $content)) {
+
+                preg_match("/['-:,; \w]+/", $content, $erro);
+                //echo $erro[0];
+                $this->erro .= $erro[0];
+                break;
+            }
+
+            if (preg_match("/error:/", $content)) {
+
+                preg_match("/['-:,; \w]+/", $content, $erro);
+                //echo $erro[0];
+                $this->erro .= $erro[0];
+                break;
+            }
+
+            if (preg_match("/No modifications/", $content)) {
+
+                preg_match("/['-:,; \w]+/", $content, $erro);
+                //echo $erro[0];
+                $this->erro .= $erro[0];
+                break;
+            }
+
+
+
+
+            $macPatern ="/([0-9a-fA-F]{2}:){5}[0-9a-fA-F]+/";
+            if(preg_match($macPatern, $content)){
+                preg_match($macPatern, $content, $mac);
+                $nMac[] = trim($mac[0]);
+            }
+
+            if (preg_match("/Commit complete./", $content)) {
+
+                preg_match("/Commit complete./", $content, $complete);
+                //echo $complete[0];
+                $this->complete .= $complete[0];
+                break;
+
+            }
+
+
+        }
+        $this->mac = (isset($nMac))? $nMac:null;
+        $this->closeSocket();
+
+    }
+
 
 }
