@@ -30,16 +30,15 @@ class Gpon extends BaseModelEloquent
     }
     public function validateChange()
     {
-        return['serrial_number' => 'require|min:12'];
+        return['serial_number' => 'require|min:12'];
     }
 
     public function olt(){
         return $this->belongsTo(Olt::class);
     }
 
-    public function ports()
-    {
-        return $this->belongsToMany(Port::class);
+    public function ethernet(){
+        return $this->hasMany(Ethernet::class);
     }
 
 

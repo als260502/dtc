@@ -2,9 +2,9 @@
 require_once __DIR__ . "/vendor/autoload.php";
 
 
-$telnet = new \Core\Telnet('172.17.75.2');
+$telnet = new \Core\Telnet('10.0.20.222');
 
-$comm = $telnet->getMac();
+$comm = $telnet->managePort();
 
 var_dump($comm);
 

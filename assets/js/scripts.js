@@ -1,5 +1,7 @@
 // Empty JS for your own code to be here
 
+
+//Populando o select de placas
 $("#chassi").on("change", function () {
 
     //console.log(JSON.parse($(this).val()));
@@ -16,7 +18,7 @@ $("#chassi").on("change", function () {
 
 });
 
-
+//adicionando o valor do borao do serial ao campo serial
 $("#serialButton").on('click', function () {
     var serialField = $("#serial");
     var serial = $(this).text();
@@ -27,6 +29,7 @@ $("#serialButton").on('click', function () {
 });
 
 
+//definindo via codigo a action do form da pagina de congidurarção das ONUs
 $("#onuForm [type=button]").click(function () {
 
     var onu_name = $("#name").val();
@@ -63,11 +66,12 @@ $("#onuForm [type=button]").click(function () {
         acao = '/dtc/save';
     }
     $("#onuForm").attr('action', acao);
-
+    $("#modal-container-486491").modal();
     $("#onuForm").submit();
 });
 
 
+//passando para os selects os valores vindo da consulta no banco
 if ($("#chassiNumber").text() != '') {
 
     var chassiValue = $("#chassi").val($("#chassiNumber").text().trim());
@@ -81,6 +85,7 @@ if ($("#chassiNumber").text() != '') {
     }));
 }
 
+// verificando campos nao selecionados
 $("#onuButton").click(function () {
 
     var onuName = $("#onuName");
@@ -106,6 +111,7 @@ $("#onuButton").click(function () {
 
 });
 
+//verificando numero de serie digitado
 $("#changeButton").click(function () {
 
     var serial = $("#serial-number").val();
@@ -133,6 +139,7 @@ $("#changeButton").click(function () {
     //return c; //you can just return c because it will be true or false
 });
 
+
 $("#activeOnu [type=button]").click(function () {
 
     var onuName = $("#onuName");
@@ -140,21 +147,128 @@ $("#activeOnu [type=button]").click(function () {
     var acao;
 
 
+    html += '<div class="alert alert-dismissable alert-warning" >';
+    html += '           <button type="button" class="close" data-dismiss="alert" aria-hidden="true">';
+    html += '                 ×';
+    html += '             </button>';
+    html += '             <h4>';
+    html += '                 Ops!';
+    html += '             </h4>';
+    html += '            <strong>Atenção!</strong> você precisa selecionar uma ONU';
+    html += '         </div>';
 
+    if (onuName.val() === 'selecione') {
+        $("#changeAlert").html(html);
+        onuName.focus();
+        onuName.css('color', 'red');
+        return;
+    }
 
 
     if ($(this).hasClass('selectButton')) {
 
-        acao = '/dtc/find';
+        acao = '/dtc/portas';
     }
     else {
-        if (onu_name == '' || serial_number == '' || chassi == '0' || olt == '0' || checkeds.length === 0 || pId.length === 0) {
-            alert('Alguns campos estao em branco ou não ha porta selecionada!!');
-            return;
-        }
-        acao = '/dtc/save';
-    }
-    $("#onuForm").attr('action', acao);
 
-    $("#onuForm").submit();
+        acao = '/dtc/active';
+    }
+    $("#activeOnu").attr('action', acao);
+
+    $("#activeOnu").submit();
 });
+
+
+$(".checkOnu").on('change', function () {
+
+    $("#onuHtmData").html('');
+
+});
+
+//enviando dados via ajax para ativação e desativação de portas
+//$("input[type='checkbox']").on('click', function () {
+$(".activateCheckbox").on('click', function () {
+
+    var result = '';
+    $("#modal-container-486491").modal();
+    $("#changeAlert").html('');
+
+    var id = $(this).val();
+    var url = '/dtc/active';
+
+    $("input[type='checkbox']").attr('disabled', true);
+    $("#selectButton").attr('disabled', true);
+
+
+    if ($(this).is(':checked')) {
+
+        sendData(url, id, 'enable');
+        console.log('enable port');
+
+    }
+    else {
+
+        result = sendData(url, id, 'disable');
+        console.log('disable port');
+
+    }
+
+
+
+});
+
+//function em ajax para enviar dados via post
+function sendData(url, id, stringAction) {
+    var html = '';
+
+
+    $.ajax({
+        url: url,
+        type: "POST",
+        method: "POST",
+        data: {
+            'id': id,
+            'action': stringAction
+        },
+        dataType: 'json',
+        //processData: false,
+        //contentType: false,
+        success: function (retorno) {
+
+            if (retorno.result === 'success') {
+
+                html += ' <div class="alert alert-dismissable alert-success">';
+                html += '                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">';
+                html += '                           ×';
+                html += '                        </button>';
+                html += '                        <h4>';
+                html += '                            Tudo certo!!!';
+                html += '                        </h4> <strong>Porta habilitada / desabilitada com sucesso!</strong>';
+                html += '                    </div>';
+
+            }
+            else {
+
+                html += ' <div class="alert alert-dismissable alert-danger">';
+                html += '                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">';
+                html += '                           ×';
+                html += '                        </button>';
+                html += '                        <h4>';
+                html += '                            OPS!!!';
+                html += '                        </h4> <strong>' + retorno.msg + '</strong>';
+                html += '                    </div>'
+                $("#onuHtmData").html('');
+
+            }
+
+            $("#modal-container-486491").modal('hide');
+            $("#changeAlert").html(html);
+            $("input[type='checkbox']").removeAttr('disabled');
+            $("#selectButton").removeAttr('disabled');
+
+            return retorno.result;
+        }
+
+    });
+}
+

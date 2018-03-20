@@ -1,3 +1,5 @@
+
+
 <p></p>
 <div class="row">
     <div class="col-md-6">
@@ -6,13 +8,18 @@
         </h3>
         <hr class="hr-primary"/>
         <form role="form" method="post" name="activeOnu" id="activeOnu" action="/dtc/active">
-            <div class="form-group"  id="checkForm" >
+            <div class="form-group" id="checkForm">
                 <div class="input-group mb-3">
-                    <select class="custom-select" id="onuName" name="onuName">
+                    <select class="custom-select checkOnu" id="onuName" name="onuName">
                         <option value="selecione">Escolha...</option>
                         <?php foreach ($this->view->onu as $onu): ?>
 
-                            <option value="<?php echo $onu->id; ?>"><?php echo $onu->onu_name; ?></option>
+                            <option value="<?php echo $onu->id; ?>"
+                                <?php
+                                echo (isset($this->view->onuID)) ? ($this->view->onuID == $onu->id) ? 'selected' : '' : '';
+                                ?>
+                            >
+                                <?php echo $onu->onu_name; ?></option>
 
                         <?php endforeach; ?>
 
@@ -24,41 +31,74 @@
 
             </div>
 
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row" id="onuHtmData">
+                        <?php if (isset($this->view->eth)): ?>
+                            <?php $i=1; foreach ($this->view->eth as $porta): ?>
+                                <div class="col-md-3">
+                                    <label class="switch">
+                                        <input type="checkbox" class="activateCheckbox" value="<?php echo $porta->id; ?>" name="porta_id[]"
+                                            <?php
+                                                echo ($porta->active == 1) ? 'checked' : '';
+                                            ?>
+                                        />
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span class="badge badge-default"><?php echo "Porta {$porta->eth}"; ?></span>
+                                    <p></p>
+                                </div>
+                            <?php $i++; endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
 
-            <button type="button" id="selectButton" class="btn btn-primary selectButton">
-                Selecionar
-            </button>
-            <button type="button" id="activateButton" class="btn btn-primary activateButton">
-                Ativar/Desativar
-            </button>
+            <div class="form-group">
+
+                <button type="button" id="selectButton"  class="btn btn-primary selectButton">
+                    Selecionar
+                </button>
+            </div>
         </form>
         <p></p>
-        <div id="changeAlert">
+        <div id="changeAlert" >
+
+            <div class="modal" id="myBody">
+
+
+            </div>
 
         </div>
-        <div>
-            <?php if (isset($this->view->error)): ?>
-                <div class="alert alert-dismissable alert-warning">
 
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
-                        ×
-                    </button>
-                    <h4>
-                        Ops!
-                    </h4> <strong>Erro!</strong> <?php echo $this->view->error; ?>
-                </div>
-            <?php endif; ?>
-            <?php if (isset($this->view->complete)): ?>
-                <div class="alert alert-dismissable alert-success">
-
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
-                        ×
-                    </button>
-                    <h4>
-                        Tudo certo!!!
-                    </h4> <strong>Reboot concluido</strong>
-                </div>
-            <?php endif; ?>
-        </div>
     </div>
-</div
+</div>
+<div class="row">
+    <div class="col-md-12">
+<!--        <a id="modal-486491" href="#modal-container-486491" role="button" class="btn" data-toggle="modal" ></a>-->
+
+        <div class="modal fade" id="modal-container-486491" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myModalLabel">
+                           Carregando...
+                        </h5>
+                     <!--   <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">×</span>
+                        </button>-->
+                    </div>
+                    <div class="modal-body">
+                        <img src="/assets/img/ajax-loader.gif" class="round" alt="carregando..." />
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+

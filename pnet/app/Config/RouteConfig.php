@@ -30,6 +30,7 @@ class RouteConfig
         $routes[] =['/dtc/reboot', 'GponController@resetOnu', 'auth'];
         $routes[] =['/dtc/get', 'GponController@getMac', 'auth'];
         $routes[] =['/dtc/portas', 'GponController@getPorts', 'auth'];
+        $routes[] =['/dtc/active', 'GponController@active', 'auth'];
 
 
 

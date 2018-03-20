@@ -13,14 +13,16 @@ fputs($fp, "pnetsenhanova2014\r\n");
 //fputs($fp,"admin\r\n");
 sleep(1);
 
-
-fputs($fp, "show interface gpon 1/1/3 onu\r\n");
-sleep(1);
 $olt = 1;
 $s_p = 1;
 
+fputs($fp, "show interface gpon 1/1/{$olt} onu\r\n");
+sleep(1);
+
+
 stream_set_timeout($fp, 2);
 $timeoutCount = 0;
+
 
 while (!feof($fp)) {
     $content = fgets($fp);
@@ -48,7 +50,7 @@ while (!feof($fp)) {
     //}
 
 
-    $n = preg_match("/[a_0-9A-Z]+\w$/", $rs, $nm);
+    $n = preg_match("/[A-Z0-9_o-s]+$/", $rs, $nm);
     if (!empty($nm)) $name[] = $nm[0];
 
     print $rs;
@@ -59,7 +61,8 @@ while (!feof($fp)) {
 
         $str = preg_replace('/--More--/', '', $rs);
         //print $rs."\n".$str;
-        $n = preg_match("/[a_0-9A-Z]+\w$/", $str, $nm);
+        //$n = preg_match("/[a_0-9A-Z]+\w$/", $str, $nm);
+        $n = preg_match("/[A-Z0-9_o-s]+$/", $str, $nm);
         if (!empty($nm)) $name[] = $nm[0];
 
         fputs($fp, " "); // sending space char for next part of output.
@@ -82,8 +85,14 @@ $status = array_shift($state);
 
 //print_r($serial);
 
+
+
 $remove = array('admin', 'OSCLI', 'CLI', 'DM4610-AL607', 'onu', 'Name', 'AL607');
+$remove = array('admin', 'OSCLI', 'CLI', 'DM4610-G321', 'onu', 'Name', '33');
 $res = array_diff($name, $remove);
+
+$res1 = array_shift($res);
+//print_r($res);
 
 //ksort($res);
 fclose($fp);
@@ -111,47 +120,76 @@ function db()
     }
 }
 
-;
+
 
 $conn = db();
-$gpon = new \App\Models\Gpon();
 $port = 1;
-$vlan = 1300;
-$serv = 300;
-$olt = 8;
-for ($i = 0; $i < count($serial); $i++) {
-    $sp = $serv + $i;
-    $data = [$i, $nme[$i], $serial[$i], $port, $vlan, $sp, $olt];
-   // print_r($data);
+$vlan = 1000;
+$serv = $s_p;
+$olt = $olt;
+//for ($i = 0; $i < count($serial); $i++) {
 
-    $sql = "INSERT INTO gpons (onu_index, onu_name, serial_number, port_number, vlan, service_port, olt_id)VALUES(:index, :name, :serial, :port_number, :vlan, :service_port, :olt_id)";
+for ($i = 0; $i < count($serial) ; $i++) {
+    $vlan = 1000 + $i;
+    $onu = 0 + $i;
+    $sp = $serv;
+    $port = 1;
+    $technology = "UTP";
+    $active = 1;
+
+    //$data = ['onu_index'=> $onu, 'onu_name' => $nme[$i],'serial_number'=>$serial[$i], 'port_number'=>$port, 'vlan'=>$vlan,'service_port'=> $sp, 'olt_id'=>$olt];
+    $data = [$onu, $nme[$i], $serial[$i], $port, $vlan, $sp, $olt];
+
+    //print "$name[$i]\n";
+    // print_r($data);
+    /*
+        if ($sp == 1) {
+            $data[4] = 2;
+            $technology = "HPNA";
+        }
+
+        if ($sp == 21) {
+            $data[0] = 0;
+            $data[1]= 'FC161';
+            $data[2]= 'DACM0000164F';
+            $data[4]= 1000;
+            $i = 19;
+        }
+
+        if ($sp == 23) {
+            $data[4] = 2;
+
+        }
+
+        if ($sp == 24) {
+            $data[0] = 21;
+            $data[1]= 'D400';
+            $data[2]= 'DACM00001743';
+            $data[4]= 1020;
+            $i = 21;
+        }
+    */
+
+    /*
+        $sql = "INSERT INTO gpons (onu_index, onu_name, serial_number, port_number, vlan, service_port, olt_id)VALUES(?,?,?,?,?,?,?)";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':index', $i);
-    $stmt->bindParam(':name', $nme[$i]);
-    $stmt->bindParam(':serial', $serial[$i]);
-    $stmt->bindParam(':port_number', $port);
-    $stmt->bindParam(':vlan', $vlan);
-    $stmt->bindParam(':service_port', $sp);
-    $stmt->bindParam(':olt_id', $olt);
 
-    $stmt->execute();
+        $stmt->execute($data);
+        $gpon_id = $conn->lastInsertId();
 
-    $vlan++;
-    /*
-        $sqlPort = "INSERT INTO ports(number, status, vlan, service_port, gpons_id)VALUES(:number, :status,  :vlan, :service_port, :gpons_id)";
 
-        $port = 1;
-        $vlan = 1000+$i
-        $stmtp = $conn->prepare($sql);
-        $stmtp->bindParam(':number', $port);
-        $$stmtp->bindParam(':status', $state[$i]);
-        $stmtp->bindParam(':vlan', $vlan);
-        $stmtp->bindParam(':service_port', $sp);
-        $stmtp->bindParam(':gpons_id', $sp);
+        $sqlPort = "INSERT INTO ethernets(eth, technology, active, gpon_id)VALUES(:eth, :technology, :active, :gpon_id)";
+
+        $stmtp = $conn->prepare($sqlPort);
+        $stmtp->bindParam(':eth', $port);
+        $stmtp->bindParam(':technology', $technology);
+        $stmtp->bindParam(':active', $active);
+        $stmtp->bindParam(':gpon_id', $sp);
 
         $stmtp->execute();
     */
+
 }
 
 

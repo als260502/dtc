@@ -37,21 +37,33 @@ class Telnet
         $this->pass = 'pnetsenhanova2014';
     }
 
-    public function getKompressorData(){
+    public function getKompressorData()
+    {
         return $this->kompressor;
     }
-    public function getContentData(){
+
+    public function getContentData()
+    {
         return $this->content;
     }
-    public function getError(){
+
+    public function getError()
+    {
         return $this->erro;
     }
-    public function getResult(){
+
+    public function getResult()
+    {
+        if (!$this->getError())
+            $this->complete = "Commit complete.";
         return $this->complete;
     }
-    public function getMacData(){
+
+    public function getMacData()
+    {
         return $this->mac;
     }
+
     public function getDiscoveredOnu($olt)
     {
 
@@ -139,10 +151,11 @@ class Telnet
         return true;
 
     }
+
     public function getMac($gpon)
     {
 
-       $this->olt = Olt::find($gpon->olt_id);
+        $this->olt = Olt::find($gpon->olt_id);
 
         $this->configString = "show mac-address-table vlan {$this->olt->qnq} | include \"service-port-$gpon->service_port \" \n";
 
@@ -154,6 +167,33 @@ class Telnet
 
 
         $gpon = null;
+        return true;
+
+    }
+
+
+
+    public function managePort(Gpon $gpon, $ports)
+    {
+
+        $this->olt = Olt::find($gpon->olt_id);
+
+        $this->configString .= "config\n";
+        $this->configString .= "interface gpon 1/1/{$this->olt->index}\n";
+        $this->configString .= "onu {$gpon->onu_index}\n";
+        $this->configString .= "ethernet {$ports->eth}\n";
+        $this->configString .=($ports->active == 1)? "no shutdown\n" : "shutdown\n";
+        $this->configString .= "!\n";
+
+
+
+        $this->comand = $this->configString;
+        $this->comand .= "commit\n";
+
+        $this->execute($this->comand, 1);
+
+        if ($this->erro) return false;
+
         return true;
 
     }
@@ -288,7 +328,7 @@ class Telnet
             $this->configString .= "!\n";
 
             $this->servicePort .= "service-port {$gpon->service_port} gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id 2 action vlan add vlan-id {$this->olt->qnq}\n";
-            $this->servicePort .= "service-port " . ($gpon->service_port + 1) . "gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 2 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$this->olt->qnq}\n";
+            $this->servicePort .= "service-port " . ($gpon->service_port + 1) . " gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 2 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$this->olt->qnq}\n";
 
             $this->lineProfile .= "config\n";
             $this->lineProfile .= "profile gpon line-profile HPNA_{$gpon->onu_name}\n";
@@ -307,6 +347,7 @@ class Telnet
             $this->lineProfile .= "ethernet 1 vlan {$gpon->vlan} cos any\n";
             $this->lineProfile .= "!\n";
             $this->lineProfile .= "!\n";
+            $this->lineProfile .= "commit\n";
             $this->lineProfile .= "!\n";
 
             $this->kompressor .= "# {$gpon->onu_name} {$gpon->serial_number}\n";
@@ -314,7 +355,7 @@ class Telnet
             $this->kompressor .= "/etc/predialnet/sobe_hpna {$this->olt->qnq} '[gw do master]'\n";
             $this->kompressor .= "\n";
 
-            $this->comand  = $this->lineProfile;
+            $this->comand = $this->lineProfile;
             $this->comand .= $this->configString;
             $this->comand .= $this->servicePort;
             $this->comand .= "commit\n";
@@ -373,6 +414,7 @@ class Telnet
             $this->lineProfile .= "ethernet 2 vlan " . ($gpon->vlan + 1) . " cos any\n";
             $this->lineProfile .= "!\n";
             $this->lineProfile .= "!\n";
+            $this->lineProfile .= "commit\n";
             $this->lineProfile .= "!\n";
 
             $this->kompressor .= "# {$gpon->onu_name} {$gpon->serial_number}\n";
@@ -383,7 +425,7 @@ class Telnet
             $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} " . ($gpon->vlan + 1) . " '[ip de telefonia]'\n";
             $this->kompressor .= "\n";
 
-            $this->comand  = $this->lineProfile;
+            $this->comand = $this->lineProfile;
             $this->comand .= $this->configString;
             $this->comand .= $this->servicePort;
             $this->comand .= "commit\n";
@@ -494,6 +536,7 @@ class Telnet
 
     }
 
+
     private function execute($command, $timeout = 2)
     {
 
@@ -501,11 +544,10 @@ class Telnet
         $timeoutCount = 0;
         while (!feof($this->socket)) {
             $content = fgets($this->socket);
-            //print "$content";
+            //print "$content<br>";
             $this->content .= $content;
             $end = preg_match("/END/", $content);
             $info = stream_get_meta_data($this->socket);
-
 
 
             if (preg_match("/--More--/", $content)) { // IF current line contain --More-- expression,
@@ -540,6 +582,13 @@ class Telnet
                 break;
             }
 
+            if (preg_match("/syntax error:/", $content)) {
+
+                preg_match("/['-:,; \w]+/", $content, $erro);
+                $this->erro .= $erro[0];
+                break;
+            }
+
             if (preg_match("/No modifications/", $content)) {
 
                 preg_match("/['-:,; \w]+/", $content, $erro);
@@ -548,15 +597,12 @@ class Telnet
                 break;
             }
 
-
-
-
-            $macPatern ="/([0-9a-fA-F]{2}:){5}[0-9a-fA-F]+/";
-            if(preg_match($macPatern, $content)){
+            $macPatern = "/([0-9a-fA-F]{2}:){5}[0-9a-fA-F]+/";
+            if (preg_match($macPatern, $content)) {
                 preg_match($macPatern, $content, $mac);
                 $nMac[] = trim($mac[0]);
             }
-
+/*
             if (preg_match("/Commit complete./", $content)) {
 
                 preg_match("/Commit complete./", $content, $complete);
@@ -565,10 +611,9 @@ class Telnet
                 break;
 
             }
-
-
+*/
         }
-        $this->mac = (isset($nMac))? $nMac:null;
+        $this->mac = (isset($nMac)) ? $nMac : null;
         $this->closeSocket();
 
     }

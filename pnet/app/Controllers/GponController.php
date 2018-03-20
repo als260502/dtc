@@ -10,6 +10,7 @@ namespace App\Controllers;
 
 
 use App\Models\Chassi;
+use App\Models\Ethernet;
 use App\Models\Gpon;
 use App\Models\Olt;
 use App\Models\Port;
@@ -22,6 +23,7 @@ class GponController extends BaseController
 {
 
     private $gpon;
+
     public function __construct()
     {
         parent::__construct();
@@ -41,7 +43,7 @@ class GponController extends BaseController
         $this->setPageTitle("Configurar ONU");
 
         $this->view->chassi = Chassi::all();
-        $this->view->ports = Port::all();
+
         $this->renderView('/onu/config', 'layout');
 
     }
@@ -49,9 +51,11 @@ class GponController extends BaseController
     public function findSerial($request)
     {
 
+        if(!isset($request->post))return Redirect::routeRedirect('/dtc/config');
+
         $this->setPageTitle("Configurar ONU");
         $this->view->chassi = Chassi::all();
-        $this->view->ports = Port::all();
+
 
         if (isset($request->post->chassi[0])) {
 
@@ -93,11 +97,14 @@ class GponController extends BaseController
     public function configOnu($request)
     {
 
+        if(!isset($request->post))return Redirect::routeRedirect('/dtc/config');
+
         $this->setPageTitle("Configurar ONU");
         $this->view->chassi = Chassi::all();
-        $this->view->ports = Port::all();
+
 
         $gpon = new Gpon();
+        $ethernet = new Ethernet();
         $chassiNumber = substr($request->post->chassi[0], 1, 1);
         $ch = $ch = Chassi::where('id', $chassiNumber)->first();
 
@@ -133,12 +140,23 @@ class GponController extends BaseController
             $gp = $gpon->create($data);
             $gponId[] = $gp->id;
             $tec[] = $ports = (isset($request->post->porta)) ? $request->post->porta[$i] : 'UTP';
+
+            $ethData = [
+                'eth' => $request->post->porta_id[$i]
+                ,'technology' => $tec[$i]
+                ,'active' => 1
+                ,'gpon_id' => $gponId[0]
+            ];
+
+            $porta = $ethernet->create($ethData);
+            $ethId[] = $porta->id;
+
         }
 
 
         $tecnologia = (count($tec) > 1) ? implode('/', $tec) : $tec[0];
         $newGpon = Gpon::find($gponId[0]);
-        $newGpon->ports()->attach($request->post->porta_id);
+
 
         $tn->configOnu($newGpon, $tecnologia);
 
@@ -147,7 +165,8 @@ class GponController extends BaseController
         if ($tn->getError()) {
             $this->view->error = $tn->getError();
             Gpon::destroy($gponId);
-            $newGpon->ports()->detach();
+            Ethernet::destroy($ethId);
+
             //var_dump($gponId);
         }
 
@@ -195,12 +214,12 @@ class GponController extends BaseController
 
     }
 
-    public function manage()
+    public function manager()
     {
-        $this->setPageTitle("Troca de  ONU");
+        $this->setPageTitle("Gerenciar BD");
 
 
-        $this->renderView('/onu/change', 'layout');
+        $this->renderView('/onu/manager', 'layout');
 
     }
 
@@ -296,15 +315,59 @@ class GponController extends BaseController
     public function getPorts($request)
     {
 
-        $gpon = Gpon::find($request->post->id);
-        $olt = Olt::find($gpon->olt_id);
-        $nGpon = $gpon->distinct()->select('port_number')->where(['onu_index' => $gpon->onu_index, 'olt_id' => $olt->id])->get();
+        if (!isset($request->post)) return Redirect::routeRedirect('/dtc/activate');
 
-       //var_dump(count($nGpon));
-        print json_encode(array('id' => count($nGpon)));
+        $this->view->onu = Gpon::all()->sortBy('onu_name');
+        $this->setPageTitle("Ativar/Desativar Portas");
+
+        $this->view->gpon = Gpon::find($request->post->onuName);
+
+        $this->view->eth = $this->view->gpon->ethernet;
+
+        $this->view->onuID = $this->view->gpon->id;
+
+        $this->view->ports = Port::all();
 
 
+        $this->renderView('/onu/ativar', 'layout');
     }
 
+    public function active($request)
+    {
+
+        $eth = Ethernet::find($request->post->id);
+        $nGpon = $eth->gpon()->first();
+        $olt = $nGpon->olt()->first();
+        $ch = Chassi::find($olt->chassi_id);
+
+        if($request->post->action == 'enable')
+            $eth->update(['active' => 1]);
+
+        if($request->post->action == 'disable')
+            $eth->update(['active' => 0 ]);
+
+        $tn = new Telnet($ch->address);
+        $tn->managePort($nGpon, $eth);
+        if($tn->getError()){
+            print json_encode([
+                'result' => 'error'
+                ,'msg' => $tn->getError()
+            ]);
+
+            if($request->post->action == 'enable')
+                $eth->update(['active' => 0]);
+
+            if($request->post->action == 'disable')
+                $eth->update(['active' => 1 ]);
+
+        }
+        else
+        {
+            print json_encode([
+                'result' => 'success'
+            ]);
+        }
+
+    }
 
 }
