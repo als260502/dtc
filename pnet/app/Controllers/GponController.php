@@ -77,7 +77,7 @@ class GponController extends BaseController
                     $this->view->vlan = (isset($gpon->vlan)) ? $gpon->vlan + 1 : 0;
 
                     $this->view->chassiNumber = $request->post->chassi;
-                    $this->view->oltNumber = (isset($olt->id)) ? $olt->id : 1;
+                    $this->view->oltNumber = (isset($olt->id)) ? $olt->index : 1;
 
                     //var_dump($this->view->oltNumber,$this->view->chassiNumber ) ;
 

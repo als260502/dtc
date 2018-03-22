@@ -1,7 +1,13 @@
 <?php
 require_once __DIR__ . "/vendor/autoload.php";
 
-$ip = '172.17.75.2';
+$removeDataFromArray = function($loops, array $array){
+    for($i=0; $i < $loops; $i++)
+        $res = array_shift($array);
+    return $array;
+};
+
+$ip = '192.168.21.53';
 $result = '';
 $fp = fsockopen($ip, 23);
 fgets($fp);
@@ -49,8 +55,9 @@ while (!feof($fp)) {
     }
     //}
 
+    $namePattern=($ip == '172.17.113.2')?"/[_a0-9A-Z]+\w$/" :"/[A-Z0-9_o-s]+$/";
 
-    $n = preg_match("/[A-Z0-9_o-s]+$/", $rs, $nm);
+    $n = preg_match("{$namePattern}", $rs, $nm);
     if (!empty($nm)) $name[] = $nm[0];
 
     print $rs;
@@ -61,8 +68,8 @@ while (!feof($fp)) {
 
         $str = preg_replace('/--More--/', '', $rs);
         //print $rs."\n".$str;
-        //$n = preg_match("/[a_0-9A-Z]+\w$/", $str, $nm);
-        $n = preg_match("/[A-Z0-9_o-s]+$/", $str, $nm);
+
+        $n = preg_match("{$namePattern}", $str, $nm);
         if (!empty($nm)) $name[] = $nm[0];
 
         fputs($fp, " "); // sending space char for next part of output.
@@ -75,7 +82,7 @@ while (!feof($fp)) {
         $timeoutCount++; // We want to count, how many times repeating.
     }
     //if ($timeoutCount >5){ // If repeating more than 2 times,
-    if ($end == 1 || $timeoutCount > 7) { // If repeating more than 2 times,
+    if ($end == 1 || $timeoutCount > 2) { // If repeating more than 2 times,
         break;   // the connection terminating..
     }
 
@@ -83,24 +90,21 @@ while (!feof($fp)) {
 
 $status = array_shift($state);
 
-//print_r($serial);
 
+$rst = $removeDataFromArray(2,$name);
 
+print_r($serial);
 
-$remove = array('admin', 'OSCLI', 'CLI', 'DM4610-AL607', 'onu', 'Name', 'AL607');
-$remove = array('admin', 'OSCLI', 'CLI', 'DM4610-G321', 'onu', 'Name', '33');
-$res = array_diff($name, $remove);
-
-$res1 = array_shift($res);
-//print_r($res);
+print_r ($name);
+//print_r($name);die;
 
 //ksort($res);
 fclose($fp);
 //echo nl2br($result);
-
+/*
 foreach ($res as $value)
     $nme[] = $value;
-
+*/
 function db()
 {
     $host = 'localhost';
@@ -121,104 +125,73 @@ function db()
 }
 
 
-
 $conn = db();
 $port = 1;
-$vlan = 1000;
-$serv = $s_p;
-$olt = $olt;
-//for ($i = 0; $i < count($serial); $i++) {
-
-for ($i = 0; $i < count($serial) ; $i++) {
-    $vlan = 1000 + $i;
+$vlan = 1300;
+$serv = 1;
+$sp = 300;
+$olt = 8;
+$nme = $rst;
+for ($i = 0; $i < count($serial); $i++) {
     $onu = 0 + $i;
-    $sp = $serv;
     $port = 1;
     $technology = "UTP";
     $active = 1;
 
-    //$data = ['onu_index'=> $onu, 'onu_name' => $nme[$i],'serial_number'=>$serial[$i], 'port_number'=>$port, 'vlan'=>$vlan,'service_port'=> $sp, 'olt_id'=>$olt];
     $data = [$onu, $nme[$i], $serial[$i], $port, $vlan, $sp, $olt];
 
-    //print "$name[$i]\n";
-    // print_r($data);
-    /*
-        if ($sp == 1) {
-            $data[4] = 2;
-            $technology = "HPNA";
-        }
+/*
 
-        if ($sp == 21) {
-            $data[0] = 0;
-            $data[1]= 'FC161';
-            $data[2]= 'DACM0000164F';
-            $data[4]= 1000;
-            $i = 19;
-        }
+    if ($sp == 1) {
+        $data[4] = 2;
+        $technology = "HPNA";
+    }
 
-        if ($sp == 23) {
-            $data[4] = 2;
 
-        }
+    if ($sp == 155) {
+        $data[4] = 2;
+        $technology = "HPNA";
+        $i--;
+        $vlan--;
+    }
 
-        if ($sp == 24) {
-            $data[0] = 21;
-            $data[1]= 'D400';
-            $data[2]= 'DACM00001743';
-            $data[4]= 1020;
-            $i = 21;
-        }
-    */
+    if ($sp == 23) {
+        $data[4] = 2;
+        $i = 20;
+        $vlan--;
+        $technology = "HPNA";
+    }
 
-    /*
-        $sql = "INSERT INTO gpons (onu_index, onu_name, serial_number, port_number, vlan, service_port, olt_id)VALUES(?,?,?,?,?,?,?)";
 
+
+    $sql = "INSERT INTO gpons (onu_index, onu_name, serial_number, port_number, vlan, service_port, olt_id)VALUES(?,?,?,?,?,?,?)";
     $stmt = $conn->prepare($sql);
+    $stmt->execute($data);
+    $gpon_id = $conn->lastInsertId();
 
-        $stmt->execute($data);
-        $gpon_id = $conn->lastInsertId();
+    $sqlPort = "INSERT INTO ethernets(eth, technology, active, gpon_id)VALUES(:eth, :technology, :active, :gpon_id)";
 
+    $stmtp = $conn->prepare($sqlPort);
+    $stmtp->bindParam(':eth', $port);
+    $stmtp->bindParam(':technology', $technology);
+    $stmtp->bindParam(':active', $active);
+    $stmtp->bindParam(':gpon_id', $gpon_id);
 
-        $sqlPort = "INSERT INTO ethernets(eth, technology, active, gpon_id)VALUES(:eth, :technology, :active, :gpon_id)";
+    $stmtp->execute();
 
-        $stmtp = $conn->prepare($sqlPort);
-        $stmtp->bindParam(':eth', $port);
-        $stmtp->bindParam(':technology', $technology);
-        $stmtp->bindParam(':active', $active);
-        $stmtp->bindParam(':gpon_id', $sp);
-
-        $stmtp->execute();
-    */
+    //print_r($data);
+*/
+    $sp++;
+    $vlan++;
 
 }
 
 
-/*
-profile gpon line-profile VT12
-
-no upstream-fec
-
-tcont 1 bandwidth-profile MAX_1081M
-
-gem 1 tcont 1
-
-map ETHERNET ethernet 1 vlan 1318 cos any
-
-top
-
-interface gpon 1/1/3
-
-onu 18
-
-line-profile VT12
-
-commit
-
-top
 
 
-do show interface gpon 1/1/3 onu 10 ethernet
-*/
+
+
+
 
 
 

@@ -76,12 +76,15 @@ if ($("#chassiNumber").text() != '') {
 
     var chassiValue = $("#chassi").val($("#chassiNumber").text().trim());
     var mValue = JSON.parse($("#chassi").val());
+    var oltNumber = $("#mOltNumber").text().trim();
     console.log(mValue + " " + chassiValue);
     console.log($("#chassiNumber").text().trim());
 
     $('#olt').html($('<option>', {
-        value: mValue['1'],
-        text: mValue['1']
+        //value: mValue['1'],
+        //text: mValue['1']
+        value: oltNumber,
+        text: oltNumber
     }));
 }
 

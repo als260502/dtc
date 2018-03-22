@@ -147,6 +147,9 @@
                     <span hidden id="chassiNumber">
                         <?php print "{$this->view->chassiNumber[0]}"; ?>
                     </span>
+                    <span hidden id="mOltNumber">
+                        <?php print (isset($this->view->oltNumber))? $this->view->oltNumber:'Selecione o Chassi'; ?>
+                    </span>
 
                 <?php endif; ?>
             </div>
