@@ -182,8 +182,7 @@ class GponController extends BaseController
     {
         $this->setPageTitle("Troca de  ONU");
 
-        $this->view->onu = Gpon::all()->sortBy('onu_name');
-
+        $this->view->onu = Gpon::select()->groupBy('onu_name')->get();
 
         $this->renderView('/onu/change', 'layout');
     }
@@ -191,15 +190,17 @@ class GponController extends BaseController
     public function reset()
     {
         $this->setPageTitle("Reboot na ONU");
-        $this->view->onu = Gpon::all()->sortBy('onu_name');
+        //$this->view->onu = Gpon::all()->sortBy('onu_name');
+        $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
 
         $this->renderView('/onu/reset', 'layout');
     }
 
     public function mac()
     {
-        $this->view->onu = Gpon::all()->sortBy('onu_name');
+        //$this->view->onu = Gpon::all()->sortBy('onu_name');
         $this->setPageTitle("Verificar MACs por traz da onu");
+        $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
 
         $this->renderView('/onu/mac', 'layout');
 
@@ -207,8 +208,9 @@ class GponController extends BaseController
 
     public function activate()
     {
-        $this->view->onu = Gpon::all()->sortBy('onu_name');
+        //$this->view->onu = Gpon::all()->sortBy('onu_name');
         $this->setPageTitle("Ativar/Desativar Portas");
+        $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
 
         $this->renderView('/onu/ativar', 'layout');
 
@@ -226,7 +228,8 @@ class GponController extends BaseController
     public function changeOnu($request)
     {
 
-        $this->view->onu = Gpon::all()->sortBy('onu_name');
+        //$this->view->onu = Gpon::all()->sortBy('onu_name');
+        $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
         $gpon = Gpon::find($request->post->onuName);
         $olt = Olt::find($gpon->olt_id);
         $chassi = Chassi::find($olt->chassi_id);
@@ -259,7 +262,8 @@ class GponController extends BaseController
     public function resetOnu($request)
     {
 
-        $this->view->onu = Gpon::all()->sortBy('onu_name');
+        //$this->view->onu = Gpon::all()->sortBy('onu_name');
+        $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
         $gpon = Gpon::find($request->post->onuName);
         $olt = Olt::find($gpon->olt_id);
         $chassi = Chassi::find($olt->chassi_id);
@@ -281,7 +285,8 @@ class GponController extends BaseController
     public function getMac($request)
     {
 
-        $this->view->onu = Gpon::all()->sortBy('onu_name');
+        //$this->view->onu = Gpon::all()->sortBy('onu_name');
+        $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
         $gpon = Gpon::find($request->post->onuName);
         $olt = Olt::find($gpon->olt_id);
         $chassi = Chassi::find($olt->chassi_id);
@@ -317,7 +322,8 @@ class GponController extends BaseController
 
         if (!isset($request->post)) return Redirect::routeRedirect('/dtc/activate');
 
-        $this->view->onu = Gpon::all()->sortBy('onu_name');
+        //$this->view->onu = Gpon::all()->sortBy('onu_name');
+        $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
         $this->setPageTitle("Ativar/Desativar Portas");
 
         $this->view->gpon = Gpon::find($request->post->onuName);
@@ -326,7 +332,6 @@ class GponController extends BaseController
 
         $this->view->onuID = $this->view->gpon->id;
 
-        $this->view->ports = Port::all();
 
 
         $this->renderView('/onu/ativar', 'layout');

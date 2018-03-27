@@ -17,9 +17,7 @@
                             <option value="<?php echo $onu->id; ?>"
                                 <?php
                                 echo (isset($this->view->onuID)) ? ($this->view->onuID == $onu->id) ? 'selected' : '' : '';
-                                ?>
-                            >
-                                <?php echo $onu->onu_name; ?></option>
+                                ?>><?php echo $onu->onu_name; ?></option>
 
                         <?php endforeach; ?>
 

@@ -29,6 +29,7 @@ class Telnet
     private $erro = null;
     private $complete = null;
     private $mac;
+    private $sapo;
 
     public function __construct($hostIP)
     {
@@ -172,7 +173,6 @@ class Telnet
     }
 
 
-
     public function managePort(Gpon $gpon, $ports)
     {
 
@@ -182,9 +182,8 @@ class Telnet
         $this->configString .= "interface gpon 1/1/{$this->olt->index}\n";
         $this->configString .= "onu {$gpon->onu_index}\n";
         $this->configString .= "ethernet {$ports->eth}\n";
-        $this->configString .=($ports->active == 1)? "no shutdown\n" : "shutdown\n";
+        $this->configString .= ($ports->active == 1) ? "no shutdown\n" : "shutdown\n";
         $this->configString .= "!\n";
-
 
 
         $this->comand = $this->configString;
@@ -273,6 +272,21 @@ class Telnet
 
     }
 
+    private function setSapoData($chassiAddress, $oltIndex, $onuIndex, $onuVlan, $serial)
+    {
+
+
+        $this->sapo .= "=============================\n";
+        $this->sapo .= "Chassi: {$chassiAddress}\n";
+        $this->sapo .= "placa: {$oltIndex}\n";
+        $this->sapo .= "ID: {$onuIndex}\n";
+        $this->sapo .= "Vlan {$onuVlan}\n";
+        $this->sapo .= "S/N {$serial}\n";
+        $this->sapo .= "Rx Optical Power [dBm]  : -00.00\n";
+        $this->sapo .= "Tx Optical Power [dBm]  : 0.00\n";
+        $this->sapo .= "=============================\n";
+
+    }
 
     private function config(Gpon $gpon, $tecnologia)
     {
@@ -299,13 +313,17 @@ class Telnet
 
             $this->servicePort .= "service-port {$gpon->service_port} gpon 1/1/{$this->olt->index} onu {$gpon->onu_index} gem 1 match vlan vlan-id {$gpon->vlan} action vlan add vlan-id {$this->olt->qnq}\n";
 
-            $this->kompressor .= "# {$gpon->onu_name} {$gpon->serial_number}\n";
-            $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} {$gpon->vlan} '[gw de telefonia]'\n";
-            $this->kompressor .= "\n";
+            $this->kompressor .= "# {$gpon->onu_name} {$gpon->serial_number}<br />\n";
+            $this->kompressor .= "#/etc/predialnet/sobe_interface {$this->olt->qnq} {$gpon->vlan} '[gw de telefonia]'<br />\n";
+
+
+            $this->setSapoData($this->olt->chassi->address, $this->olt->index, $gpon->onu_index
+                               , $gpon->vlan, $gpon->serial_number);
 
             $this->comand = $this->configString;
             $this->comand .= $this->servicePort;
             $this->comand .= "commit\n";
+
 
             $this->execute($this->comand);
 
@@ -354,6 +372,9 @@ class Telnet
             $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} {$gpon->vlan} '[ip de telefonia]'\n";
             $this->kompressor .= "/etc/predialnet/sobe_hpna {$this->olt->qnq} '[gw do master]'\n";
             $this->kompressor .= "\n";
+
+            $this->setSapoData($this->olt->chassi->address, $this->olt->index, $gpon->onu_index
+                , $gpon->vlan, $gpon->serial_number);
 
             $this->comand = $this->lineProfile;
             $this->comand .= $this->configString;
@@ -425,6 +446,9 @@ class Telnet
             $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} " . ($gpon->vlan + 1) . " '[ip de telefonia]'\n";
             $this->kompressor .= "\n";
 
+            $this->setSapoData($this->olt->chassi->address, $this->olt->index, $gpon->onu_index
+                , $gpon->vlan, $gpon->serial_number);
+
             $this->comand = $this->lineProfile;
             $this->comand .= $this->configString;
             $this->comand .= $this->servicePort;
@@ -468,6 +492,9 @@ class Telnet
             $this->kompressor .= "# Porta 2 SUB\n";
             $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} " . ($gpon->vlan + 1) . " '[gw de telefonia]'\n";
             $this->kompressor .= "\n";
+
+            $this->setSapoData($this->olt->chassi->address, $this->olt->index, $gpon->onu_index
+                , $gpon->vlan, $gpon->serial_number);
 
             $this->comand .= $this->configString;
             $this->comand .= $this->servicePort;
@@ -520,6 +547,9 @@ class Telnet
             $this->kompressor .= "# Porta 3 Rede UTP ou SUB\n";
             $this->kompressor .= "/etc/predialnet/sobe_interface {$this->olt->qnq} " . ($gpon->vlan + 2) . " '[gw de telefonia]'\n";
             $this->kompressor .= "\n";
+
+            $this->setSapoData($this->olt->chassi->address, $this->olt->index, $gpon->onu_index
+                , $gpon->vlan, $gpon->serial_number);
 
             $this->comand .= $this->configString;
             $this->comand .= $this->servicePort;
@@ -602,16 +632,16 @@ class Telnet
                 preg_match($macPatern, $content, $mac);
                 $nMac[] = trim($mac[0]);
             }
-/*
-            if (preg_match("/Commit complete./", $content)) {
+            /*
+                        if (preg_match("/Commit complete./", $content)) {
 
-                preg_match("/Commit complete./", $content, $complete);
-                //echo $complete[0];
-                $this->complete .= $complete[0];
-                break;
+                            preg_match("/Commit complete./", $content, $complete);
+                            //echo $complete[0];
+                            $this->complete .= $complete[0];
+                            break;
 
-            }
-*/
+                        }
+            */
         }
         $this->mac = (isset($nMac)) ? $nMac : null;
         $this->closeSocket();

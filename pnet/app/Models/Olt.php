@@ -20,11 +20,11 @@ class Olt extends BaseModelEloquent
     protected $fillable = ['index','qnq', 'qtd_onu', 'chassis_id'];
 
     public function gpon(){
-        $this->hasMany(Gpon::class);
+        return $this->hasMany(Gpon::class);
     }
 
     public function chassi(){
-        $this->belongsTo(Chassi::class, 'olt_id');
+       return $this->belongsTo(Chassi::class);
     }
 
 }
