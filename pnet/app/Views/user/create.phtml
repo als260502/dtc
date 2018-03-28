@@ -9,7 +9,7 @@
                 </div>
                 <div class="panel-body">
 
-                    <form action="/user/store" method="post" accept-charset="utf-8">
+                    <form action="<?php echo MY_HOST; ?>/user/store" method="post" accept-charset="utf-8">
 
                         <div class="form-group <?php echo (isset($this->error['name'])) ? 'has-error' : '' ?>">
                             <label for="name" class="control-label">Name</label>

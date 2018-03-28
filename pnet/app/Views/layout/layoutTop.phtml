@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?php echo MY_HOST; ?>/assets/css/bootstrap.min.css">
     <style>
         body {
             padding-top: 50px;
@@ -17,13 +17,13 @@
     <link rel="stylesheet" href="/assets/css/style.css">
     <!--    <link rel="stylesheet" href="/assets/css/menu.css">-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css">
-    <link href="/assets/img/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
+    <link href="<?php echo MY_HOST; ?>/assets/img/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
 
 </head>
 
 <body>
 <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top ">
-    <a class="navbar-brand" href="/dtc">Pnex DTC</a>
+    <a class="navbar-brand" href="<?php echo MY_HOST; ?>/main">Pnex DTC</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -38,13 +38,13 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
 
-                    <a class="dropdown-item" href="/dtc/config">Configurar ONU</a>
-                    <a class="dropdown-item" href="/dtc/change">Trocar ONU</a>
-                     <a class="dropdown-item" href="/dtc/reset">Resetar ONU</a>
-                     <a class="dropdown-item" href="/dtc/mac">Verificar mac na ONU</a>
-                     <a class="dropdown-item" href="/dtc/activate">Ativat/Desativar porta</a>
+                    <a class="dropdown-item" href="<?php echo MY_HOST; ?>/config">Configurar ONU</a>
+                    <a class="dropdown-item" href="<?php echo MY_HOST; ?>/change">Trocar ONU</a>
+                     <a class="dropdown-item" href="<?php echo MY_HOST; ?>/reset">Resetar ONU</a>
+                     <a class="dropdown-item" href="<?php echo MY_HOST; ?>/mac">Verificar mac na ONU</a>
+                     <a class="dropdown-item" href="<?php echo MY_HOST; ?>/activate">Ativat/Desativar porta</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="dtc/manager">Gerenciar bd ONU</a>
+                    <a class="dropdown-item" href="<?php echo MY_HOST; ?>/manager">Gerenciar bd ONU</a>
                 </div>
             </li>
 
@@ -56,20 +56,20 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">
-                        <img src="/assets/open-iconic-master/svg/person.svg"
+                        <img src="<?php echo MY_HOST; ?>/assets/open-iconic-master/svg/person.svg"
                              alt="account-logout"/> <?php echo $this->auth->name(); ?>
                     </a>
 
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="/logout"><img
-                                    src="/assets/open-iconic-master/svg/account-logout.svg"
+                        <a class="dropdown-item" href="<?php echo MY_HOST; ?>/logout"><img
+                                    src="<?php echo MY_HOST; ?>/assets/open-iconic-master/svg/account-logout.svg"
                                     alt="account-logout"/> Logout</a>
                     </div>
 
                 </li>
             <?php else: ?>
-                <li><a href="/login"><i class="glyphicon glyphicon-log-in"></i> Login</a></li>
-                <li><a href="/user/create"><i class="glyphicon glyphicon-pencil"></i> Register</a></li>
+                <li><a href="<?php echo MY_HOST; ?>/login"><i class="glyphicon glyphicon-log-in"></i> Login</a></li>
+                <li><a href="<?php echo MY_HOST; ?>/user/create"><i class="glyphicon glyphicon-pencil"></i> Register</a></li>
             <?php endif; ?>
         </ul>
     </div><!--/.navbar-collapse -->

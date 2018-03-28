@@ -42,6 +42,10 @@ class Telnet
     {
         return $this->kompressor;
     }
+    public function getSapoData()
+    {
+        return $this->sapo;
+    }
 
     public function getContentData()
     {
@@ -276,15 +280,15 @@ class Telnet
     {
 
 
-        $this->sapo .= "=============================\n";
-        $this->sapo .= "Chassi: {$chassiAddress}\n";
-        $this->sapo .= "placa: {$oltIndex}\n";
-        $this->sapo .= "ID: {$onuIndex}\n";
-        $this->sapo .= "Vlan {$onuVlan}\n";
-        $this->sapo .= "S/N {$serial}\n";
-        $this->sapo .= "Rx Optical Power [dBm]  : -00.00\n";
-        $this->sapo .= "Tx Optical Power [dBm]  : 0.00\n";
-        $this->sapo .= "=============================\n";
+        $this->sapo .= "=============================<br />\n";
+        $this->sapo .= "Chassi: {$chassiAddress}<br />\n";
+        $this->sapo .= "placa: {$oltIndex}<br />\n";
+        $this->sapo .= "ID: {$onuIndex}<br />\n";
+        $this->sapo .= "Vlan {$onuVlan}<br />\n";
+        $this->sapo .= "S/N {$serial}<br />\n";
+        $this->sapo .= "Rx Optical Power [dBm]  : -00.00<br />\n";
+        $this->sapo .= "Tx Optical Power [dBm]  : 0.00<br />\n";
+        $this->sapo .= "=============================<br />\n";
 
     }
 
@@ -613,9 +617,10 @@ class Telnet
             }
 
             if (preg_match("/syntax error:/", $content)) {
-
-                preg_match("/['-:,; \w]+/", $content, $erro);
-                $this->erro .= $erro[0];
+                $ct = $content;
+                //preg_match("/['-:,; \w]+/", $content, $erro);
+                preg_match('/[\w+:" \.]+/', $content, $erro);
+                $this->erro .=$erro[0].$ct;
                 break;
             }
 

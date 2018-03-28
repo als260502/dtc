@@ -39,6 +39,15 @@
 
             <div class="form-group">
 
+                <label for="onu_index">
+                    ONU ID
+                </label>
+                <input type="text" required="required" name="onu_index" class="form-control" id="onu_index" value="<?php echo (isset($this->view->onuIndex))? $this->view->onuIndex:'';  ?>"/>
+
+            </div>
+
+            <div class="form-group">
+
                 <label for="name">
                     Nome do local
                 </label>
@@ -128,6 +137,10 @@
             <p class="text-primary text-left">
                 <?php echo $this->view->kompressor; ?>
             </p>
+            <h5 class="h5 text-center text-success">Dados da ficha do prédio </h5>
+            <p class="text-primary text-left">
+                <?php echo $this->view->sapo; ?>
+            </p>
         <?php endif; ?>
     </div>
 
@@ -176,7 +189,7 @@
                            </button>-->
                     </div>
                     <div class="modal-body">
-                        <img src="/assets/img/ajax-loader.gif" class="round" alt="carregando..." />
+                        <img src="<?php echo MY_HOST; ?>/assets/img/ajax-loader.gif" class="round" alt="carregando..." />
                     </div>
                     <div class="modal-footer">
                     </div>

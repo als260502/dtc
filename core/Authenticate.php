@@ -32,11 +32,11 @@ trait Authenticate
 
             Session::set('user', $user);
 
-            return Redirect::routeRedirect('/dtc');
+            return Redirect::routeRedirect(MY_HOST.'/main');
 
     }
 
-        return Redirect::routeRedirect('/', [
+        return Redirect::routeRedirect(MY_HOST, [
            'error' => ['Usuário ou senha estão incorretos!'],
             'inputs' => ['user'=> $request->post->user]
         ]);
@@ -46,7 +46,7 @@ trait Authenticate
     public function logout ()
     {
         Session::destroy('user');
-        return Redirect::routeRedirect('/login');
+        return Redirect::routeRedirect(MY_HOST.'/login');
     }
 
 }

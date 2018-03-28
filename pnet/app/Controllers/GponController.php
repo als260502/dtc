@@ -51,7 +51,7 @@ class GponController extends BaseController
     public function findSerial($request)
     {
 
-        if(!isset($request->post))return Redirect::routeRedirect('/dtc/config');
+        if(!isset($request->post))return Redirect::routeRedirect(MY_HOST.'/config');
 
         $this->setPageTitle("Configurar ONU");
         $this->view->chassi = Chassi::all();
@@ -97,7 +97,7 @@ class GponController extends BaseController
     public function configOnu($request)
     {
 
-        if(!isset($request->post))return Redirect::routeRedirect('/dtc/config');
+        if(!isset($request->post))return Redirect::routeRedirect(MY_HOST.'/config');
 
         $this->setPageTitle("Configurar ONU");
         $this->view->chassi = Chassi::all();
@@ -121,14 +121,15 @@ class GponController extends BaseController
         ];
 
         if (Validator::make($validate, $gpon->validate())) {
-            return Redirect::routeRedirect('/dtc/config', [
+            return Redirect::routeRedirect(MY_HOST.'/config', [
                 'Error' => "campos obrigatorio estão em branco"]);
         }
 
-        $onuIndex = (isset($olt->id)) ? Gpon::where('olt_id', $olt->id)->orderBy('service_port', 'desc')->first()->onu_index + 1 : 0;
+        //$index = (isset($olt->id)) ? Gpon::where('olt_id', $olt->id)->orderBy('service_port', 'desc')->first()->onu_index + 1: $this->post->onu_index;
+        //$onuIndex = (isset($index)) ? $index : $this->post->onu_index;
 
         for ($i = 0; $i < count($request->post->porta); $i++) {
-            $data = ['onu_index' => $onuIndex
+            $data = ['onu_index' => $request->post->onu_index
                 , 'onu_name' => $request->post->name
                 , 'serial_number' => $request->post->serial
                 , 'port_number' => $i + 1
@@ -172,6 +173,7 @@ class GponController extends BaseController
 
         $this->view->content = $tn->getContentData();
         $this->view->kompressor = $tn->getKompressorData();
+        $this->view->sapo = $tn->getSapoData();
         $this->view->complete = $tn->getResult();
 
 
@@ -241,7 +243,7 @@ class GponController extends BaseController
         $tn = new Telnet($chassi->address);
 
         if (Validator::make($dataToValidate, $gpon->validateChange())) {
-            return Redirect::routeRedirect('/dtc/change', [
+            return Redirect::routeRedirect(MY_HOST.'/change', [
                 'Error' => "algo que nao esta certo esta errado!!!"]);
         }
 
@@ -320,7 +322,7 @@ class GponController extends BaseController
     public function getPorts($request)
     {
 
-        if (!isset($request->post)) return Redirect::routeRedirect('/dtc/activate');
+        if (!isset($request->post)) return Redirect::routeRedirect(MY_HOST.'/activate');
 
         //$this->view->onu = Gpon::all()->sortBy('onu_name');
         $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();

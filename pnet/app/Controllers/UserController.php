@@ -58,7 +58,7 @@ class UserController extends BaseController
 
         if(Validator::make($data, $this->users->validateInsert()))
         {
-            return Redirect::routeRedirect('/user/create');
+            return Redirect::routeRedirect(MY_HOST.'/user/create');
         }
 
 
@@ -68,13 +68,13 @@ class UserController extends BaseController
 
             $this->users->create($data);
 
-            return Redirect::routeRedirect("/user/create", [
+            return Redirect::routeRedirect(MY_HOST."/user/create", [
                 'success' => ["Usuário criado com sucesso"]
             ]);
 
         }catch (\Exception $e){
 
-            return Redirect::routeRedirect("/user/create", [
+            return Redirect::routeRedirect(MY_HOST."/user/create", [
                 'error' => ["Erro: {$e->getMessage()}"]
             ]);
         }

@@ -8,33 +8,33 @@ class RouteConfig
 {
 
     public function getRoutes(){
-        $routes[] =['/', 'UserController@index'];
-        $routes[] =['/login', 'UserController@login'];
-        $routes[] =['/login/auth', 'UserController@auth'];
-        $routes[] =['/logout', 'UserController@logout'];
+        $routes[] =[MY_HOST.'/', 'UserController@index'];
+        $routes[] =[MY_HOST.'/login', 'UserController@login'];
+        $routes[] =[MY_HOST.'/login/auth', 'UserController@auth'];
+        $routes[] =[MY_HOST.'/logout', 'UserController@logout'];
 
-        $routes[] =['/user/create', 'UserController@create'];
-        $routes[] =['/user/store', 'UserController@store'];
+        $routes[] =[MY_HOST.'/user/create', 'UserController@create'];
+        $routes[] =[MY_HOST.'/user/store', 'UserController@store'];
 
-        $routes[] =['/dtc', 'GponController@index', 'auth'];
-        $routes[] =['/dtc/config', 'GponController@config', 'auth'];
-        $routes[] =['/dtc/change', 'GponController@change', 'auth'];
-        $routes[] =['/dtc/reset', 'GponController@reset', 'auth'];
-        $routes[] =['/dtc/mac', 'GponController@mac', 'auth'];
-        $routes[] =['/dtc/activate', 'GponController@activate', 'auth'];
-        $routes[] =['/dtc/manager', 'GponController@manager', 'auth'];
+        $routes[] =[MY_HOST.'/main', 'GponController@index', 'auth'];
+        $routes[] =[MY_HOST.'/config', 'GponController@config', 'auth'];
+        $routes[] =[MY_HOST.'/change', 'GponController@change', 'auth'];
+        $routes[] =[MY_HOST.'/reset', 'GponController@reset', 'auth'];
+        $routes[] =[MY_HOST.'/mac', 'GponController@mac', 'auth'];
+        $routes[] =[MY_HOST.'/activate', 'GponController@activate', 'auth'];
+        $routes[] =[MY_HOST.'/manager', 'GponController@manager', 'auth'];
 
-        $routes[] =['/dtc/find', 'GponController@findSerial', 'auth'];
-        $routes[] =['/dtc/save', 'GponController@configOnu', 'auth'];
-        $routes[] =['/dtc/updateonu', 'GponController@changeOnu', 'auth'];
-        $routes[] =['/dtc/reboot', 'GponController@resetOnu', 'auth'];
-        $routes[] =['/dtc/get', 'GponController@getMac', 'auth'];
-        $routes[] =['/dtc/portas', 'GponController@getPorts', 'auth'];
-        $routes[] =['/dtc/active', 'GponController@active', 'auth'];
+        $routes[] =[MY_HOST.'/find', 'GponController@findSerial', 'auth'];
+        $routes[] =[MY_HOST.'/save', 'GponController@configOnu', 'auth'];
+        $routes[] =[MY_HOST.'/updateonu', 'GponController@changeOnu', 'auth'];
+        $routes[] =[MY_HOST.'/reboot', 'GponController@resetOnu', 'auth'];
+        $routes[] =[MY_HOST.'/get', 'GponController@getMac', 'auth'];
+        $routes[] =[MY_HOST.'/portas', 'GponController@getPorts', 'auth'];
+        $routes[] =[MY_HOST.'/active', 'GponController@active', 'auth'];
 
 
 
-        $routes[] =['/dtc/mon', 'GponController@mon', 'auth'];
+        $routes[] =[MY_HOST.'/mon', 'GponController@mon', 'auth'];
 
 
 

@@ -56,14 +56,14 @@ $("#onuForm [type=button]").click(function () {
             alert('Selecione o CHASSI e PLACA por favor!');
             return;
         }
-        acao = '/dtc/find';
+        acao = '/pnexdtc/find';
     }
     else {
         if (onu_name == '' || serial_number == '' || chassi == '0' || olt == '0' || checkeds.length === 0 || pId.length === 0) {
             alert('Alguns campos estao em branco ou não ha porta selecionada!!');
             return;
         }
-        acao = '/dtc/save';
+        acao = '/pnexdtc/save';
     }
     $("#onuForm").attr('action', acao);
     $("#modal-container-486491").modal();
@@ -132,12 +132,14 @@ $("#changeButton").click(function () {
 
     //var c = confirm("Confirmar troca do serial de "+onuName+ " para "+serial);
 
-    if (serial.length < 12) {
+    if (serial.length < 11) {
         $("#changeAlert").html(html);
         s.focus();
         s.css('color', 'red');
         return;
     }
+
+    $("#modal-container-486491").modal();
     $('#changeOnu').submit();
     //return c; //you can just return c because it will be true or false
 });
@@ -170,11 +172,11 @@ $("#activeOnu [type=button]").click(function () {
 
     if ($(this).hasClass('selectButton')) {
 
-        acao = '/dtc/portas';
+        acao = '/pnexdtc/portas';
     }
     else {
 
-        acao = '/dtc/active';
+        acao = '/pnexdtc/active';
     }
     $("#activeOnu").attr('action', acao);
 
@@ -197,7 +199,7 @@ $(".activateCheckbox").on('click', function () {
     $("#changeAlert").html('');
 
     var id = $(this).val();
-    var url = '/dtc/active';
+    var url = '/pnexdtc/active';
 
     $("input[type='checkbox']").attr('disabled', true);
     $("#selectButton").attr('disabled', true);

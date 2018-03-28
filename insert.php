@@ -7,7 +7,7 @@ $removeDataFromArray = function($loops, array $array){
     return $array;
 };
 
-$ip = '192.168.21.53';
+$ip = '172.17.113.2';
 $result = '';
 $fp = fsockopen($ip, 23);
 fgets($fp);
@@ -19,7 +19,7 @@ fputs($fp, "pnetsenhanova2014\r\n");
 //fputs($fp,"admin\r\n");
 sleep(1);
 
-$olt = 5;
+$olt = 6;
 $s_p = 1;
 
 fputs($fp, "show interface gpon 1/1/{$olt} onu\r\n");
@@ -96,7 +96,7 @@ $rst = $removeDataFromArray(2,$name);
 //print_r($serial);
 
 print_r ($name);
-print_r($rst);
+//print_r($rst);
 
 //ksort($res);
 fclose($fp);
@@ -127,10 +127,10 @@ function db()
 
 $conn = db();
 $port = 1;
-$vlan = 1600;
+$vlan = 1750;
 $serv = 1;
-$sp = 600;
-$olt = 13;
+$sp = 750;
+$olt = 14;
 $nme = $rst;
 for ($i = 0; $i < count($serial); $i++) {
     $onu = 0 + $i;
@@ -140,28 +140,20 @@ for ($i = 0; $i < count($serial); $i++) {
 
     $data = [$onu, $nme[$i], $serial[$i], $port, $vlan, $sp, $olt];
 
-    if($sp > 508){$data[0]+= 1;}
+    if($sp == 763 || $sp == 816)
+       $i--;
+    if($sp == 764 || $sp == 817)
+        $data[3] = 2;
 
 
-    if ($sp == 603 || $sp == 611 || $sp == 619 || $sp == 626 || $sp == 634 || $sp == 651 || $sp == 656) {
+
+    if ($sp == 789) {
         $technology = "HPNA";
         $data[4] = 2;
         $i--;
         $vlan--;
     }
-    if ($sp == 657 || $sp == 659 || $sp == 661 || $sp == 663 || $sp == 665) {
-        $i--;
-    }
-    if ($sp == 658 || $sp == 660 || $sp == 662 || $sp == 664) {
-        $data[3] =2;
-    }
-    if($sp == 666){
-        $i--;
-        $data[3] = 2;
-    }
-    if($sp == 667){
-         $data[3] = 3;
-    }
+
 
     $sql = "INSERT INTO gpons (onu_index, onu_name, serial_number, port_number, vlan, service_port, olt_id)VALUES(?,?,?,?,?,?,?)";
     $stmt = $conn->prepare($sql);
