@@ -36,6 +36,8 @@ class GponController extends BaseController
     {
         $this->setPageTitle("Gerência de ONU");
         return $this->renderView('/mon_dtc/main', 'layout');
+
+
     }
 
     public function config($request)
@@ -230,6 +232,7 @@ class GponController extends BaseController
     public function changeOnu($request)
     {
 
+        if (!isset($request->post)) return Redirect::routeRedirect(MY_HOST.'/change');
         //$this->view->onu = Gpon::all()->sortBy('onu_name');
         $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
         $gpon = Gpon::find($request->post->onuName);
@@ -286,7 +289,7 @@ class GponController extends BaseController
 
     public function getMac($request)
     {
-
+        if (!isset($request->post)) return Redirect::routeRedirect(MY_HOST.'/mac');
         //$this->view->onu = Gpon::all()->sortBy('onu_name');
         $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
         $gpon = Gpon::find($request->post->onuName);
@@ -302,17 +305,19 @@ class GponController extends BaseController
         for ($i = 0; $i < count($nGpon); $i++) {
 
             $tn->getMac($nGpon[$i]);
-            $mac[$i] = $tn->getMacData();
-            $mCount[] = count($tn->getMacData());
 
-            $totalMac += $mCount[$i];
+            if($tn->getMacData()) {
+                $mac[$i] = $tn->getMacData();
+                $mCount[] = count($tn->getMacData());
 
-            $nMac[0] = $mac[$i];
+                $totalMac += $mCount[$i];
 
+                $nMac[0] = $mac[$i];
+            }
         }
 
-        $this->view->mac = $nMac[0];
-        $this->view->macCount = $totalMac;
+        $this->view->mac = (isset($nMac[0]))?$nMac[0]: ['Error'=>'nenhum mac encontrado'];
+        $this->view->macCount = (isset($nMac[0]))?$totalMac: 0;
 
         $this->renderView('/onu/mac', 'layout');
 

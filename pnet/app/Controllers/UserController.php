@@ -40,6 +40,8 @@ class UserController extends BaseController
     public function create(){
 
         $this->setPageTitle("New User");
+
+
         return $this->renderView('/user/create', 'layout');
 
     }
@@ -78,7 +80,6 @@ class UserController extends BaseController
                 'error' => ["Erro: {$e->getMessage()}"]
             ]);
         }
-
 
     }
 

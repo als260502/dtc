@@ -110,6 +110,9 @@ $("#onuButton").click(function () {
         onuName.css('color', 'red');
         return;
     }
+    console.log("buscando mac!!");
+    $("#modal-container-486491").modal();
+
     $("#formOnu").submit();
 
 });
@@ -140,6 +143,7 @@ $("#changeButton").click(function () {
     }
 
     $("#modal-container-486491").modal();
+
     $('#changeOnu').submit();
     //return c; //you can just return c because it will be true or false
 });
