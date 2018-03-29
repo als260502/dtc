@@ -108,7 +108,7 @@ abstract class BaseController
     }
 
     public function forbiden(){
-        return Redirect::routeRedirect('/login');
+        return Redirect::routeRedirect(MY_HOST.'/login');
     }
 
 }

@@ -42,6 +42,7 @@ class Telnet
     {
         return $this->kompressor;
     }
+
     public function getSapoData()
     {
         return $this->sapo;
@@ -49,6 +50,7 @@ class Telnet
 
     public function getContentData()
     {
+
         return $this->content;
     }
 
@@ -72,33 +74,37 @@ class Telnet
     public function getDiscoveredOnu($olt)
     {
 
+
         $command = "show interface gpon 1/1/{$olt} discovered-onus";
         $pattern = "/DACM[A-Z0-9]+/";
         $timeoutCount = 0;
         $this->executeComand($command);
-        while (!feof($this->socket)) {
-            $result = fgets($this->socket, 128);
-            //print $result;
-            if (preg_match($pattern, $result)) {
-                $rt = trim($result);
-                preg_match($pattern, $rt, $this->result);
+        if ($this->socket) {
+            while (!feof($this->socket)) {
+                $result = fgets($this->socket, 128);
+                //print $result;
+                if (preg_match($pattern, $result)) {
+                    $rt = trim($result);
+                    preg_match($pattern, $rt, $this->result);
+                }
+
+                $end = preg_match("/END/", $result);
+                $info = stream_get_meta_data($this->socket);
+
+                if ($info['timed_out']) { // If timeout of connection info has got a value, the router not returning a output.
+                    $timeoutCount++; // We want to count, how many times repeating.
+                }
+
+                if ($end == 1 || $timeoutCount > 1) { // If repeating more than 2 times,
+                    print "\r\n";
+                    break;   // the connection terminating..
+                }
+
             }
 
-            $end = preg_match("/END/", $result);
-            $info = stream_get_meta_data($this->socket);
-
-            if ($info['timed_out']) { // If timeout of connection info has got a value, the router not returning a output.
-                $timeoutCount++; // We want to count, how many times repeating.
-            }
-
-            if ($end == 1 || $timeoutCount > 1) { // If repeating more than 2 times,
-                print "\r\n";
-                break;   // the connection terminating..
-            }
-
+            return $this->result[0];
         }
-
-        return $this->result[0];
+        return null;
 
     }
 
@@ -207,12 +213,12 @@ class Telnet
 
         $this->socket = fsockopen($this->host, 23, $errno, $errstr, 5);
 
-        //var_dump($this->socket);
-
-        if (!$this->socket) {
-            $this->socket = false;
-            return ("ERRO: {$errno}\n{$errstr}\n");
+        if ($this->socket == false) {
+            $this->erro = utf8_encode("nao foi possivel stabelecer conexao com o chassi!!!\n{$errno}\n{$errstr}\n");
+            $this->socket == null;
+            return $this->socket;
         }
+
 
         //stream_set_timeout($this->socket, 1);
         fgets($this->socket);
@@ -237,44 +243,13 @@ class Telnet
 
     private function executeComand($comand, $timeout = 2)
     {
-        if (!$this->openSocket()) return;
-        if ($this->socket) {
-            fputs($this->socket, "{$comand}\r\n");
-            stream_set_timeout($this->socket, "{$timeout}");
-        }
-    }
+        if (!$this->openSocket()) return null;
 
-    private function doComand($command)
-    {
-
-        $timeoutCount = 0;
-        $this->executeComand($command);
-        while (!feof($this->socket)) {
-            $this->result = fgets($this->socket);
-            //print "$this->result";
-
-            # If the router say "press space for more", send space char:
-            if (preg_match("/--More--/", $this->result)) { // IF current line contain --More-- expression,
-
-                fputs($this->socket, ' '); // sending space char for next part of output.
-
-            } # The "more" controlling part complated.
-
-            $end = preg_match("/END/", $this->result);
-            $info = stream_get_meta_data($this->socket);
-
-            if ($info['timed_out']) { // If timeout of connection info has got a value, the router not returning a output.
-                $timeoutCount++; // We want to count, how many times repeating.
-            }
-            //if ($timeoutCount >5){ // If repeating more than 2 times,
-            if ($end == 1 || $timeoutCount > 5) { // If repeating more than 2 times,
-                print "\r\n";
-                break;   // the connection terminating..
-            }
-
-        }
+        fputs($this->socket, "{$comand}\r\n");
+        stream_set_timeout($this->socket, "{$timeout}");
 
     }
+
 
     private function setSapoData($chassiAddress, $oltIndex, $onuIndex, $onuVlan, $serial)
     {
@@ -322,7 +297,7 @@ class Telnet
 
 
             $this->setSapoData($this->olt->chassi->address, $this->olt->index, $gpon->onu_index
-                               , $gpon->vlan, $gpon->serial_number);
+                , $gpon->vlan, $gpon->serial_number);
 
             $this->comand = $this->configString;
             $this->comand .= $this->servicePort;
@@ -574,6 +549,9 @@ class Telnet
     private function execute($command, $timeout = 2)
     {
 
+        $this->content .= "{$command}\n";
+        if (!$this->openSocket()) return $this->socket;
+
         $this->executeComand($command, $timeout);
         $timeoutCount = 0;
         while (!feof($this->socket)) {
@@ -620,7 +598,7 @@ class Telnet
                 $ct = $content;
                 //preg_match("/['-:,; \w]+/", $content, $erro);
                 preg_match('/[\w+:" \.]+/', $content, $erro);
-                $this->erro .=$erro[0].$ct;
+                $this->erro .= $erro[0] . $ct;
                 break;
             }
 

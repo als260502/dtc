@@ -13,8 +13,8 @@ use App\Models\Chassi;
 use App\Models\Ethernet;
 use App\Models\Gpon;
 use App\Models\Olt;
-use App\Models\Port;
 use Core\BaseController;
+use Core\Log;
 use Core\Telnet;
 use Core\Validator;
 use Core\Redirect;
@@ -35,16 +35,19 @@ class GponController extends BaseController
     public function index()
     {
         $this->setPageTitle("Gerência de ONU");
+
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Acessando Pagina Inicial");
+
         return $this->renderView('/mon_dtc/main', 'layout');
-
-
     }
 
-    public function config($request)
+    public function config()
     {
         $this->setPageTitle("Configurar ONU");
 
         $this->view->chassi = Chassi::all();
+
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Acessando Pagina de configuração de ONU");
 
         $this->renderView('/onu/config', 'layout');
 
@@ -58,6 +61,7 @@ class GponController extends BaseController
         $this->setPageTitle("Configurar ONU");
         $this->view->chassi = Chassi::all();
 
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Buscando Serial de ONU no chassi {$request->post->chassi[0]}");
 
         if (isset($request->post->chassi[0])) {
 
@@ -81,12 +85,15 @@ class GponController extends BaseController
                     $this->view->chassiNumber = $request->post->chassi;
                     $this->view->oltNumber = (isset($olt->id)) ? $olt->index : 1;
 
+                    Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Dump da busca de ONU\n {$tn->getContentData()}\n");
+
                     //var_dump($this->view->oltNumber,$this->view->chassiNumber ) ;
 
 
                 } else {
                     $this->view->mac = "Nenhum gpon encontrado!";
                     $this->view->class = 'warning';
+                    Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Dump da busca de ONU\n {$tn->getError()}\n");
                 }
 
             }
@@ -104,6 +111,7 @@ class GponController extends BaseController
         $this->setPageTitle("Configurar ONU");
         $this->view->chassi = Chassi::all();
 
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Confgurando ONU\n".implode('|', (array)$request->post));
 
         $gpon = new Gpon();
         $ethernet = new Ethernet();
@@ -170,7 +178,7 @@ class GponController extends BaseController
             Gpon::destroy($gponId);
             Ethernet::destroy($ethId);
 
-            //var_dump($gponId);
+            Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Erro ao configurar ONU\n {$tn->getError()}\n");
         }
 
         $this->view->content = $tn->getContentData();
@@ -178,6 +186,7 @@ class GponController extends BaseController
         $this->view->sapo = $tn->getSapoData();
         $this->view->complete = $tn->getResult();
 
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Dump da configuração de ONU \n {$tn->getContentData()}\n");
 
         $this->renderView('/onu/config', 'layout');
     }
@@ -188,6 +197,8 @@ class GponController extends BaseController
 
         $this->view->onu = Gpon::select()->groupBy('onu_name')->get();
 
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Acessando Area de troca de serial da ONU\n");
+
         $this->renderView('/onu/change', 'layout');
     }
 
@@ -196,7 +207,7 @@ class GponController extends BaseController
         $this->setPageTitle("Reboot na ONU");
         //$this->view->onu = Gpon::all()->sortBy('onu_name');
         $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
-
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Acessando Area de reset de ONU\n");
         $this->renderView('/onu/reset', 'layout');
     }
 
@@ -206,6 +217,7 @@ class GponController extends BaseController
         $this->setPageTitle("Verificar MACs por traz da onu");
         $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
 
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Acessando Area de verificar mac por traz da ONU\n");
         $this->renderView('/onu/mac', 'layout');
 
     }
@@ -216,6 +228,8 @@ class GponController extends BaseController
         $this->setPageTitle("Ativar/Desativar Portas");
         $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
 
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Acessando Area de ativar/desativar portas da ONU\n");
+
         $this->renderView('/onu/ativar', 'layout');
 
     }
@@ -224,7 +238,7 @@ class GponController extends BaseController
     {
         $this->setPageTitle("Gerenciar BD");
 
-
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Acessando Area em construção da ferramenta ONU\n");
         $this->renderView('/onu/manager', 'layout');
 
     }
@@ -233,6 +247,8 @@ class GponController extends BaseController
     {
 
         if (!isset($request->post)) return Redirect::routeRedirect(MY_HOST.'/change');
+
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Alterando serial da  ONU\n".implode('|', (array)$request->post));
         //$this->view->onu = Gpon::all()->sortBy('onu_name');
         $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
         $gpon = Gpon::find($request->post->onuName);
@@ -255,10 +271,14 @@ class GponController extends BaseController
             $this->view->error = $tn->getError();
             //var_dump($tn->getError());
             $gpon->update(['serial_number' => $oldSerial]);
+
+            Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Erro ao alterar serial ONU\n {$tn->getError()}");
         }
 
         $this->view->content = $tn->getContentData();
         $this->view->complete = $tn->getResult();
+
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Dump da alteração  de n/s da ONU\n {$tn->getContentData()}");
 
         $this->renderView('/onu/change', 'layout');
 
@@ -266,8 +286,10 @@ class GponController extends BaseController
 
     public function resetOnu($request)
     {
+        if (!isset($request->post)) return Redirect::routeRedirect(MY_HOST.'/reset');
 
-        //$this->view->onu = Gpon::all()->sortBy('onu_name');
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Rebootando  ONU\n".implode('|', (array)$request->post));
+
         $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
         $gpon = Gpon::find($request->post->onuName);
         $olt = Olt::find($gpon->olt_id);
@@ -277,19 +299,25 @@ class GponController extends BaseController
 
         if (!$tn->resetOnu($gpon)) {
             $this->view->error = $tn->getError();
+            Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Erro ao rebootar ONU\n {$tn->getError()}");
         }
 
         $this->view->content = $tn->getContentData();
         $this->view->complete = 'complete';
 
 
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Dump do reboot da ONU\n {$tn->getContentData()}");
         $this->renderView('/onu/reset', 'layout');
+
 
     }
 
     public function getMac($request)
     {
         if (!isset($request->post)) return Redirect::routeRedirect(MY_HOST.'/mac');
+
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Buscando mac por traz da  ONU\n".implode('|', (array)$request->post));
+
         //$this->view->onu = Gpon::all()->sortBy('onu_name');
         $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
         $gpon = Gpon::find($request->post->onuName);
@@ -313,11 +341,14 @@ class GponController extends BaseController
                 $totalMac += $mCount[$i];
 
                 $nMac[0] = $mac[$i];
+                Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Erro ao buscar mac na ONU\n {$tn->getError()}");
             }
         }
 
         $this->view->mac = (isset($nMac[0]))?$nMac[0]: ['Error'=>'nenhum mac encontrado'];
         $this->view->macCount = (isset($nMac[0]))?$totalMac: 0;
+
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Dump da varredura de mac da ONU\n {$tn->getContentData()}");
 
         $this->renderView('/onu/mac', 'layout');
 
@@ -329,6 +360,8 @@ class GponController extends BaseController
 
         if (!isset($request->post)) return Redirect::routeRedirect(MY_HOST.'/activate');
 
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Buscando portas ativa na ONU\n");
+
         //$this->view->onu = Gpon::all()->sortBy('onu_name');
         $this->view->onu = Gpon::select(['id','onu_name'])->groupBy('onu_name')->get();
         $this->setPageTitle("Ativar/Desativar Portas");
@@ -339,8 +372,6 @@ class GponController extends BaseController
 
         $this->view->onuID = $this->view->gpon->id;
 
-
-
         $this->renderView('/onu/ativar', 'layout');
     }
 
@@ -348,6 +379,8 @@ class GponController extends BaseController
     {
 
         $eth = Ethernet::find($request->post->id);
+
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Iniciando ativação ou desativação da portada ONU\n");
         $nGpon = $eth->gpon()->first();
         $olt = $nGpon->olt()->first();
         $ch = Chassi::find($olt->chassi_id);
@@ -372,6 +405,8 @@ class GponController extends BaseController
             if($request->post->action == 'disable')
                 $eth->update(['active' => 1 ]);
 
+            Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Erro ao ativar ou desativar porta da ONU\n {$tn->getError()}");
+
         }
         else
         {
@@ -380,6 +415,7 @@ class GponController extends BaseController
             ]);
         }
 
+        Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Dump da ativação ou desativação das portas da ONU\n {$tn->getContentData()}");
     }
 
 }

@@ -56,14 +56,14 @@ $("#onuForm [type=button]").click(function () {
             alert('Selecione o CHASSI e PLACA por favor!');
             return;
         }
-        acao = '/pnexdtc/find';
+        acao = '/dtc/find';
     }
     else {
         if (onu_name == '' || serial_number == '' || chassi == '0' || olt == '0' || checkeds.length === 0 || pId.length === 0) {
             alert('Alguns campos estao em branco ou não ha porta selecionada!!');
             return;
         }
-        acao = '/pnexdtc/save';
+        acao = '/dtc/save';
     }
     $("#onuForm").attr('action', acao);
     $("#modal-container-486491").modal();
@@ -176,11 +176,11 @@ $("#activeOnu [type=button]").click(function () {
 
     if ($(this).hasClass('selectButton')) {
 
-        acao = '/pnexdtc/portas';
+        acao = '/dtc/portas';
     }
     else {
 
-        acao = '/pnexdtc/active';
+        acao = '/dtc/active';
     }
     $("#activeOnu").attr('action', acao);
 
@@ -203,7 +203,7 @@ $(".activateCheckbox").on('click', function () {
     $("#changeAlert").html('');
 
     var id = $(this).val();
-    var url = '/pnexdtc/active';
+    var url = '/dtc/active';
 
     $("input[type='checkbox']").attr('disabled', true);
     $("#selectButton").attr('disabled', true);

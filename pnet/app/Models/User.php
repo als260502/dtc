@@ -18,7 +18,7 @@ class User extends BaseModelEloquent
     public $table = 'users';
     public $timestamps = false;
 
-    protected $fillable = ['name', 'email', 'password', 'user'];
+    protected $fillable = ['name', 'email', 'password', 'user', 'status'];
 
 
     public function validateInsert(){

@@ -15,6 +15,7 @@ class Auth
     private static $name = null;
     private static $email = null;
     private static $user = null;
+    private static $status = null;
 
 
     public function __construct()
@@ -27,6 +28,7 @@ class Auth
             self::$name = $user['name'];
             self::$email = $user['email'];
             self::$user = $user['user'];
+            self::$status = $user['status'];
 
 
         }
@@ -46,6 +48,10 @@ class Auth
 
     public static function user(){
         return self::$user;
+    }
+
+    public static function status(){
+        return self::$status;
     }
 
     public static function check()

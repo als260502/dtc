@@ -14,26 +14,38 @@ class Log
 {
 
 
-    public static function storeLog($AccessedPage, $activityDescription)
+    public static function storeLog($AccessedPage, $activityDescription, $user = null)
     {
 
-        $data =[
-                'user' => self::getUser()
-                ,'page'=>$AccessedPage
-                ,'description'=>$activityDescription
-                ,'date'=>self::getDate()
-             ];
+        $data = array();
 
+        if($user == null) {
+            $data = [
+                  'user' => Auth::user()
+                , 'page' => $AccessedPage
+                , 'description' => $activityDescription
+                , 'date' => self::getDate()
+            ];
+        }else{
+            $data = [
+                'user' => $user
+                , 'page' => $AccessedPage
+                , 'description' => $activityDescription
+                , 'date' => self::getDate()
+            ];
+        }
+    //var_dump($data);
         Logging::create($data);
 
+
     }
 
 
-    private function getUser(){
-        return Session::get('user');
+    private  static function getUser(){
+        return Session::get('user')['user'];
     }
 
-    private function getDate()
+    private static function getDate()
     {
         date_default_timezone_set('America/Sao_Paulo');
         $date = date('Y-m-d H:i:s');
