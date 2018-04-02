@@ -62,8 +62,9 @@
 
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="<?php echo MY_HOST; ?>/logout"><img src="<?php echo MY_HOST; ?>/assets/open-iconic-master/svg/account-logout.svg" alt="account-logout"/> Logout</a>
-
-                        <a class="dropdown-item" href="<?php echo MY_HOST; ?>/user/create"><img src="<?php echo MY_HOST; ?>/assets/open-iconic-master/svg/key.svg" alt="key"/> Register</a>
+                        <?php if ($this->auth->status() == 1): ?>
+                            <a class="dropdown-item" href="<?php echo MY_HOST; ?>/user/create"><img src="<?php echo MY_HOST; ?>/assets/open-iconic-master/svg/key.svg" alt="key"/> Register</a>
+                        <?php endif; ?>
                      </div>
 
                 </li>
