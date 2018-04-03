@@ -37,7 +37,6 @@ class Log
     //var_dump($data);
         Logging::create($data);
 
-
     }
 
 
