@@ -1,69 +1,43 @@
 <div class="row">
-    <div class="col-md-4">
-        <p></p>
+    <div class="col-md-12">
         <h3>
             <?php echo $this->getPageTitle(); ?>
         </h3>
         <hr class="hr-primary"/>
-        <div class="row">
-            <div class="col-md-12">
-                <a href="<?php echo MY_HOST; ?>/config">
-                    <button type="button" class="btn btn-sm btn-outline-primary">
-                        Configurar ONU
-                    </button>
-                </a>
-            </div>
-        </div>
-        <p></p>
-        <div class="row">
-            <div class="col-md-12">
-                <a href="<?php echo MY_HOST; ?>/change">
-                    <button type="button" class="btn btn-sm btn-outline-primary">
-                        Troca de ONU
-                    </button>
-                </a>
-            </div>
-        </div>
-        <p></p>
-        <div class="row">
-            <div class="col-md-12">
-                <a href="<?php echo MY_HOST; ?>/reset">
-                    <button type="button" class="btn btn-sm btn-outline-primary">
-                        Rebootar ONU
-                    </button>
-                </a>
-            </div>
-        </div>
-        <p></p>
-        <div class="row">
-            <div class="col-md-12">
-                <a href="<?php echo MY_HOST; ?>/mac">
-                    <button type="button" class="btn btn-sm btn-outline-primary">
-                        Enxergar MACs
-                    </button>
-                </a>
-            </div>
-        </div>
-        <p></p>
-        <div class="row">
-            <div class="col-md-12">
-                <a href="<?php echo MY_HOST; ?>/activate">
-                    <button type="button" class="btn btn-sm btn-outline-primary">
-                        Ativar/Desativar porta
-                    </button>
-                </a>
-            </div>
-        </div>
-        <p></p>
-        <div class="row">
-            <div class="col-md-12">
-                <a href="<?php echo MY_HOST; ?>/manager">
-                    <button type="button" class="btn btn-sm btn-outline-primary">
-                        GERENCIAR ONU BD
-                    </button>
-                </a>
-            </div>
-        </div>
-        <p></p>
     </div>
+</div>
+
+<div class="row">
+
+    <div class="col-md-2">
+
+        <a href="<?php echo MY_HOST; ?>/config" class="btn btn-block btn-outline-primary btn-sm">Configurar ONU </a>
+
+
+        <a href="<?php echo MY_HOST; ?>/change" class="btn btn-block btn-outline-primary btn-sm">Troca de ONU</a>
+
+
+        <a href="<?php echo MY_HOST; ?>/reset" class="btn btn-block btn-outline-primary btn-sm">
+            Rebootar ONU
+        </a>
+
+        <a href="<?php echo MY_HOST; ?>/mac" class="btn btn-block btn-outline-primary btn-sm">
+            Enxergar MACs
+        </a>
+
+        <a href="<?php echo MY_HOST; ?>/activate" class="btn btn-block btn-outline-primary btn-sm">
+            Ativar/Desativar porta
+        </a>
+
+        <a href="<?php echo MY_HOST; ?>/manager" class="btn btn-block btn-outline-primary btn-sm">
+            GERENCIAR ONU BD
+        </a>
+    </div>
+    <div class="col-md-4">
+
+    </div>
+    <div class="col-md-4">
+
+    </div>
+
 </div>
