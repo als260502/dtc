@@ -19,7 +19,7 @@ fputs($fp, "pnetsenhanova2014\r\n");
 //fputs($fp,"admin\r\n");
 sleep(1);
 
-$olt = 6;
+$olt = 7;
 $s_p = 1;
 
 fputs($fp, "show interface gpon 1/1/{$olt} onu\r\n");
@@ -127,9 +127,9 @@ function db()
 
 $conn = db();
 $port = 1;
-$vlan = 1750;
+$vlan = 1900;
 $serv = 1;
-$sp = 750;
+$sp = 900;
 $olt = 14;
 $nme = $rst;
 for ($i = 0; $i < count($serial); $i++) {
@@ -140,20 +140,11 @@ for ($i = 0; $i < count($serial); $i++) {
 
     $data = [$onu, $nme[$i], $serial[$i], $port, $vlan, $sp, $olt];
 
-    if($sp == 763 || $sp == 816)
+    if($sp == 907 || $sp == 917)
        $i--;
-    if($sp == 764 || $sp == 817)
+
+    if($sp == 908 || $sp == 918)
         $data[3] = 2;
-
-
-
-    if ($sp == 789) {
-        $technology = "HPNA";
-        $data[4] = 2;
-        $i--;
-        $vlan--;
-    }
-
 
     $sql = "INSERT INTO gpons (onu_index, onu_name, serial_number, port_number, vlan, service_port, olt_id)VALUES(?,?,?,?,?,?,?)";
     $stmt = $conn->prepare($sql);

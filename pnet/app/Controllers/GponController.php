@@ -314,7 +314,10 @@ class GponController extends BaseController
 
     public function getMac($request)
     {
+
+
         if (!isset($request->post)) return Redirect::routeRedirect(MY_HOST.'/mac');
+        $this->setPageTitle("Verificar MACs por traz da onu");
 
         Log::storeLog("view: /user/".__FUNCTION__." Function: ".__METHOD__, "Buscando mac por traz da  ONU\n".implode('|', (array)$request->post));
 

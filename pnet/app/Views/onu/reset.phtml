@@ -5,7 +5,7 @@
             <?php echo $this->getPageTitle(); ?>
         </h3>
         <hr class="hr-primary"/>
-        <form role="form" method="post" name="resetOnu" id="formOnu" action="/dtc/reboot">
+        <form role="form" method="post" name="resetOnu" id="formOnu" action="<?php echo MY_HOST; ?>/reboot">
             <div class="form-group">
 
                 <div class="input-group mb-3">
@@ -58,4 +58,32 @@
             <?php endif; ?>
         </div>
     </div>
-</div
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <!--        <a id="modal-486491" href="#modal-container-486491" role="button" class="btn" data-toggle="modal" ></a>-->
+
+        <div class="modal fade" id="modal-container-486491" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myModalLabel">
+                            Carregando...
+                        </h5>
+                        <!--   <button type="button" class="close" data-dismiss="modal">
+                               <span aria-hidden="true">×</span>
+                           </button>-->
+                    </div>
+                    <div class="modal-body">
+                        <img src="<?php echo MY_HOST; ?>/assets/img/ajax-loader.gif" class="round" alt="carregando..." />
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
